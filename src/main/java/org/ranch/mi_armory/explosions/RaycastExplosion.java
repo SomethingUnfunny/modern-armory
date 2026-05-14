@@ -1,6 +1,9 @@
 package org.ranch.mi_armory.explosions;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector2d;
 import org.joml.Vector3d;
 import org.joml.Vector3i;
@@ -15,16 +18,26 @@ public class RaycastExplosion {
 	private int strength;
 	private int speed;
 	private int range;
+	private int shell;
+	private int maxShells;
+
+	public boolean castingComplete = false;
 
 	public RaycastExplosion(Level world, Vector3i origin, int strength, int speed, int range) {
 		this.level = world;
 		this.origin = origin;
 		this.strength = strength;
 		this.speed = speed;
-		this.iterator = new GSPIterator(strength * strength * 7);
+		this.range = range;
+		shell = 0;
+		maxShells = 2;
 	}
 
-	public Vector3d sphericalToCartesian(Vector2d point) {
+	private int calculatePointDensity(int radius) {
+		return (int) (Math.PI * radius * radius);
+	}
+
+	private Vector3d sphericalToCartesian(Vector2d point) {
 		double x = Math.cos(point.x) * Math.sin(point.y);
 		double z = Math.sin(point.x) * Math.sin(point.y);
 		double y = Math.cos(point.y);
@@ -32,11 +45,30 @@ public class RaycastExplosion {
 	}
 
 	public void castPoints(int amount) {
+
+		if (iterator == null) {
+			if (shell == maxShells) {
+				castingComplete = true;
+				return;
+			}
+			iterator = new GSPIterator(calculatePointDensity(range));
+		}
+
+		System.out.println("casting " + amount + " points");
+
 		for (int i = 0; i < amount; i++) {
-			if (!iterator.hasNext()) break;
+			System.out.println(i);
+			if (!iterator.hasNext()) {
+				iterator = null;
+				shell++;
+				return;
+			}
 
 			Vector2d sPoint = iterator.next();
-			Vector3d point = sphericalToCartesian(sPoint);
+			Vector3d vec = sphericalToCartesian(sPoint).mul(range * ((shell + 1D) / maxShells));
+			Vector3d point = vec.add(origin.x, origin.y, origin.z);
+
+			level.setBlock(BlockPos.containing(point.x, point.y, point.z), Blocks.RED_WOOL.defaultBlockState(), 3);
 
 			// todo cast ray thru every block and save end pos to hash set of every chunk it passed thru
 		}
@@ -49,7 +81,7 @@ public class RaycastExplosion {
 	public static class GSPIterator implements Iterator<Vector2d> {
 
 		private int i;
-		private int n;
+		private final int n;
 
 		public GSPIterator(int n) {
 			this.n = n;
@@ -65,6 +97,7 @@ public class RaycastExplosion {
 		public Vector2d next() {
 			double theta = Math.PI * (1 + Math.sqrt(5)) * i;
 			double phi = Math.acos(1 - (double) (2 * i) / n);
+			i++;
 			return new Vector2d(theta, phi);
 		}
 	}

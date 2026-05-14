@@ -2,6 +2,8 @@ package org.ranch.mi_armory;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -72,6 +74,8 @@ public class MiArmory {
 		// Register the Deferred Register to the mod event bus so tabs get registered
 		CREATIVE_MODE_TABS.register(modEventBus);
 
+		MiArmoryEntities.register(modEventBus);
+
 		// Register ourselves for server and other game events we are interested in.
 		// Note that this is necessary if and only if we want *this* class (MiArmory) to respond directly to events.
 		// Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
@@ -112,6 +116,7 @@ public class MiArmory {
 	public static class ClientModEvents {
 		@SubscribeEvent
 		public static void onClientSetup(FMLClientSetupEvent event) {
+			EntityRenderers.register(MiArmoryEntities.NUKE.get(), NoopRenderer::new);
 			// Some client setup code
 			LOGGER.info("HELLO FROM CLIENT SETUP");
 			LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
