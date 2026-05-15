@@ -3,15 +3,13 @@ package org.ranch.mi_armory.explosions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.AirBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import org.joml.Vector2d;
-import org.joml.Vector3d;
-import org.joml.Vector3i;
+import org.joml.*;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
+import java.lang.Math;
+import java.util.*;
 
 public class RaycastExplosion {
 
@@ -22,18 +20,22 @@ public class RaycastExplosion {
 	private int range;
 
 	public boolean castingComplete = false;
+	public boolean removingComplete = false;
 
 	private HashMap<ChunkPos, Set<float[]>> perChunk = new HashMap<>();
+	private List<ChunkPos> orderedChunks = new ArrayList<>();
+	private CoordComparator comparator;
 
 	public RaycastExplosion(Level world, Vector3i origin, int strength, int range) {
 		this.level = world;
 		this.origin = origin;
 		this.strength = strength;
 		this.range = range;
+		comparator = new CoordComparator(origin);
 	}
 
 	private int calculatePointDensity(int radius) {
-		return (int) Math.PI * radius * radius * 8;
+		return (int) Math.PI * radius * radius * 10;
 	}
 
 	private Vector3d sphericalToCartesian(Vector2d point) {
@@ -45,10 +47,11 @@ public class RaycastExplosion {
 
 	public void castPoints(int amount) {
 
-
 		if (iterator == null) {
 			iterator = new GSPIterator(calculatePointDensity(range));
 		}
+
+		System.out.println("casting " + amount + " rays");
 
 		for (int i = 0; i < amount; i++) {
 			if (!iterator.hasNext()) {
@@ -61,6 +64,9 @@ public class RaycastExplosion {
 
 			float res = strength;
 
+			float[] lastpos = null;
+			Set<ChunkPos> traveledChunks = new HashSet<>();
+
 			for (int j = 0; j < range; j++) {
 				float x = (float) (dir.x * j + origin.x);
 				float y = (float) (dir.y * j + origin.y);
@@ -70,16 +76,88 @@ public class RaycastExplosion {
 				if (block.getFluidState().isEmpty())
 					res -= block.getBlock().getExplosionResistance();
 
+
 				if (res <= 0) break;
-				level.setBlock(BlockPos.containing(x, y, z), Blocks.AIR.defaultBlockState(), 3);
+
+				if (!block.isAir()) {
+					lastpos = new float[]{x, y, z};
+					traveledChunks.add(new ChunkPos(((int) x) >> 4, ((int) z) >> 4));
+				}
+
+				//level.setBlock(BlockPos.containing(x, y, z), Blocks.AIR.defaultBlockState(), 3);
 			}
 
-			// todo cast ray thru every block and save end pos to hash set of every chunk it passed thru
+			if (lastpos != null) {
+				for (ChunkPos chunkPos : traveledChunks) {
+					perChunk.computeIfAbsent(chunkPos, k -> new HashSet<>());
+					perChunk.get(chunkPos).add(lastpos);
+				}
+			}
 		}
+		orderedChunks.clear();
+		orderedChunks.addAll(perChunk.keySet());
+		orderedChunks.sort(comparator);
 	}
 
 	public void processChunk() {
-		// todo go thru chunk pos hash set and delete every block for every end pos ray thing
+		if (perChunk.isEmpty()) {
+			removingComplete = true;
+			return;
+		}
+
+		System.out.println("removing chunk, " + perChunk.size() + " remaining chunks");
+
+		ChunkPos current = orderedChunks.get(0);
+
+		System.out.println(orderedChunks.size());
+
+		Set<float[]> tips = perChunk.get(current);
+
+		int enter = Math.min(Math.abs(origin.x - (current.x << 4)), Math.abs(origin.z - (current.z << 4))) - 16;
+		enter = Math.max(enter, 0);
+
+		if (tips != null) {
+			for (float[] tip : tips) {
+				Vector3f vec = new Vector3f(tip[0] - origin.x, tip[1] - origin.y, tip[2] - origin.z);
+
+				boolean inChunk = false;
+
+				for (int i = enter; i < vec.length(); i++) {
+					int x = (int) ((vec.x / vec.length()) * i + origin.x);
+					int y = (int) ((vec.y / vec.length()) * i + origin.y);
+					int z = (int) ((vec.z / vec.length()) * i + origin.z);
+
+					if (x >> 4 == current.x && z >> 4 == current.z) {
+						inChunk = true;
+						BlockPos blockPos = new BlockPos(x, y, z);
+
+						level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 2);
+					} else if (inChunk) {
+						break;
+					}
+				}
+			}
+		}
+
+		perChunk.remove(current);
+		orderedChunks.remove(0);
+	}
+
+	public class CoordComparator implements Comparator<ChunkPos> {
+
+		Vector3i origin;
+
+		public CoordComparator(Vector3i origin) {
+			this.origin = origin;
+		}
+
+		public int compare(ChunkPos c1, ChunkPos c2) {
+			int chunkX = origin.x >> 4;
+			int chunkZ = origin.z >> 4;
+			int diff1 = Math.abs(chunkX - c1.x) + Math.abs(chunkZ - c1.z);
+			int diff2 = Math.abs(chunkX - c2.x) + Math.abs(chunkZ - c2.z);
+			return diff1 - diff2;
+		}
 	}
 
 	public static class GSPIterator implements Iterator<Vector2d> {

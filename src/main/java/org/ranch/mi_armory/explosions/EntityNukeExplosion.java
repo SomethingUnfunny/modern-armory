@@ -32,11 +32,15 @@ public class EntityNukeExplosion extends EntityChunkloading {
 	public void tick() {
 		super.tick();
 		if (explosion == null) {
-			this.explosion = new RaycastExplosion(this.level(), new Vector3i(this.getBlockX(), this.getBlockY(), this.getBlockZ()), 20, 150);
+			this.explosion = new RaycastExplosion(this.level(), new Vector3i(this.getBlockX(), this.getBlockY(), this.getBlockZ()), 40, 300);
 		}
 
+		loadChunk(this.getBlockX() >> 4, this.getBlockZ() >> 4);
+
 		if (!explosion.castingComplete) {
-			explosion.castPoints(2000);
+			explosion.castPoints(20000);
+		} else if (!explosion.removingComplete) {
+			explosion.processChunk();
 		} else {
 			this.remove(RemovalReason.DISCARDED);
 		}
