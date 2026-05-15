@@ -1,6 +1,7 @@
 package org.ranch.mi_armory.explosions;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -8,7 +9,9 @@ import org.joml.Vector2d;
 import org.joml.Vector3d;
 import org.joml.Vector3i;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 public class RaycastExplosion {
 
@@ -16,25 +19,21 @@ public class RaycastExplosion {
 	private Level level;
 	private Vector3i origin;
 	private int strength;
-	private int speed;
 	private int range;
-	private int shell;
-	private int maxShells;
 
 	public boolean castingComplete = false;
 
-	public RaycastExplosion(Level world, Vector3i origin, int strength, int speed, int range) {
+	private HashMap<ChunkPos, Set<float[]>> perChunk = new HashMap<>();
+
+	public RaycastExplosion(Level world, Vector3i origin, int strength, int range) {
 		this.level = world;
 		this.origin = origin;
 		this.strength = strength;
-		this.speed = speed;
 		this.range = range;
-		shell = 0;
-		maxShells = 2;
 	}
 
 	private int calculatePointDensity(int radius) {
-		return (int) (Math.PI * radius * radius);
+		return (int) Math.PI * radius * radius * 8;
 	}
 
 	private Vector3d sphericalToCartesian(Vector2d point) {
@@ -46,29 +45,34 @@ public class RaycastExplosion {
 
 	public void castPoints(int amount) {
 
+
 		if (iterator == null) {
-			if (shell == maxShells) {
-				castingComplete = true;
-				return;
-			}
 			iterator = new GSPIterator(calculatePointDensity(range));
 		}
 
-		System.out.println("casting " + amount + " points");
-
 		for (int i = 0; i < amount; i++) {
-			System.out.println(i);
 			if (!iterator.hasNext()) {
-				iterator = null;
-				shell++;
+				castingComplete = true;
 				return;
 			}
 
 			Vector2d sPoint = iterator.next();
-			Vector3d vec = sphericalToCartesian(sPoint).mul(range * ((shell + 1D) / maxShells));
-			Vector3d point = vec.add(origin.x, origin.y, origin.z);
+			Vector3d dir = sphericalToCartesian(sPoint);
 
-			level.setBlock(BlockPos.containing(point.x, point.y, point.z), Blocks.RED_WOOL.defaultBlockState(), 3);
+			float res = strength;
+
+			for (int j = 0; j < range; j++) {
+				float x = (float) (dir.x * j + origin.x);
+				float y = (float) (dir.y * j + origin.y);
+				float z = (float) (dir.z * j + origin.z);
+
+				BlockState block = level.getBlockState(new BlockPos((int) x, (int) y, (int) z));
+				if (block.getFluidState().isEmpty())
+					res -= block.getBlock().getExplosionResistance();
+
+				if (res <= 0) break;
+				level.setBlock(BlockPos.containing(x, y, z), Blocks.AIR.defaultBlockState(), 3);
+			}
 
 			// todo cast ray thru every block and save end pos to hash set of every chunk it passed thru
 		}
