@@ -105,8 +105,6 @@ public class RaycastExplosion {
 			return;
 		}
 
-		System.out.println("removing chunk, " + perChunk.size() + " remaining chunks");
-
 		ChunkPos current = orderedChunks.get(0);
 
 		System.out.println(orderedChunks.size());
@@ -131,7 +129,7 @@ public class RaycastExplosion {
 						inChunk = true;
 						BlockPos blockPos = new BlockPos(x, y, z);
 
-						level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 2);
+						level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 1);
 					} else if (inChunk) {
 						break;
 					}
@@ -143,7 +141,7 @@ public class RaycastExplosion {
 		orderedChunks.remove(0);
 	}
 
-	public class CoordComparator implements Comparator<ChunkPos> {
+	public static class CoordComparator implements Comparator<ChunkPos> {
 
 		Vector3i origin;
 
