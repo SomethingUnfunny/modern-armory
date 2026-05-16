@@ -32,16 +32,14 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import org.ranch.mi_armory.rendering.EntityNukeEffectsRenderer;
+import org.ranch.mi_armory.rendering.nuke.EntityNukeEffectsRenderer;
 import org.slf4j.Logger;
 
-// The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(MiArmory.MODID)
 public class MiArmory {
-	// Define mod id in a common place for everything to reference
 	public static final String MODID = "mi_armory";
-	// Directly reference a slf4j logger
 	private static final Logger LOGGER = LogUtils.getLogger();
+
 	// Create a Deferred Register to hold Blocks which will all be registered under the "mi_armory" namespace
 	public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MODID);
 	// Create a Deferred Register to hold Items which will all be registered under the "mi_armory" namespace
@@ -62,8 +60,6 @@ public class MiArmory {
 		output.accept(EXAMPLE_ITEM.get()); // Add the example item to the tab. For your own tabs, this method is preferred over the event
 	}).build());
 
-	// The constructor for the mod class is the first code that is run when your mod is loaded.
-	// FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
 	public MiArmory(IEventBus modEventBus, ModContainer modContainer) {
 		// Register the commonSetup method for modloading
 		modEventBus.addListener(this::commonSetup);
@@ -77,9 +73,6 @@ public class MiArmory {
 
 		MiArmoryEntities.register(modEventBus);
 
-		// Register ourselves for server and other game events we are interested in.
-		// Note that this is necessary if and only if we want *this* class (MiArmory) to respond directly to events.
-		// Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
 		NeoForge.EVENT_BUS.register(this);
 
 		// Register the item to a creative tab
@@ -109,19 +102,14 @@ public class MiArmory {
 	@SubscribeEvent
 	public void onServerStarting(ServerStartingEvent event) {
 		// Do something when the server starts
-		LOGGER.info("HELLO from server starting");
 	}
 
-	// You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
-	@EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+	@EventBusSubscriber(modid = MODID, value = Dist.CLIENT)
 	public static class ClientModEvents {
 		@SubscribeEvent
 		public static void onClientSetup(FMLClientSetupEvent event) {
 			EntityRenderers.register(MiArmoryEntities.NUKE.get(), NoopRenderer::new);
 			EntityRenderers.register(MiArmoryEntities.TOREX.get(), EntityNukeEffectsRenderer::new);
-			// Some client setup code
-			LOGGER.info("HELLO FROM CLIENT SETUP");
-			LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
 		}
 	}
 }

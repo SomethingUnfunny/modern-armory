@@ -1,22 +1,30 @@
-package org.ranch.mi_armory.rendering;
+package org.ranch.mi_armory.rendering.nuke;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3dc;
+import org.joml.Vector3f;
 import org.ranch.mi_armory.MiArmory;
 import org.ranch.mi_armory.MiArmoryRenderTypes;
+import org.ranch.mi_armory.rendering.Cloudlet;
+import org.ranch.mi_armory.rendering.EntityNukeEffects;
 
 public class EntityNukeEffectsRenderer extends EntityRenderer<EntityNukeEffects> {
 
 	private static final ResourceLocation CLOUDLET_TEXTURE = ResourceLocation.fromNamespaceAndPath(MiArmory.MODID, "textures/particle_base.png");
-	private static final RenderType CLOUDLET_RENDER_TYPE = MiArmoryRenderTypes.cloudlet(CLOUDLET_TEXTURE);
+	private static final ResourceLocation FLASH_TEXTURE = ResourceLocation.fromNamespaceAndPath(MiArmory.MODID, "textures/flare.png");
+
+	private static final RenderType CLOUDLET_RENDER_TYPE = RenderType.itemEntityTranslucentCull(CLOUDLET_TEXTURE);
+	private static final RenderType FLASH_RENDER_TYPE = MiArmoryRenderTypes.flash(FLASH_TEXTURE);
+
 
 	public EntityNukeEffectsRenderer(EntityRendererProvider.Context context) {
 		super(context);
@@ -27,19 +35,25 @@ public class EntityNukeEffectsRenderer extends EntityRenderer<EntityNukeEffects>
 		return null;
 	}
 
-	public void render(EntityNukeEffects ent, float p_114600_, float p_114601_, PoseStack poseStack, MultiBufferSource bufferSource, int light) {
-		poseStack.pushPose();
-		poseStack.mulPose(entityRenderDispatcher.cameraOrientation());
-		VertexConsumer vertexconsumer = bufferSource.getBuffer(CLOUDLET_RENDER_TYPE);
-		for (Cloudlet c : ent.cloudlets) {
-			cloudlet(vertexconsumer, poseStack, (float) c.pos.x, (float) c.pos.y, (float) c.pos.z, 255, 255, 255, 100, 1);
-		}
-		poseStack.popPose();
+	@Override
+	public boolean shouldRender(EntityNukeEffects livingEntity, Frustum camera, double camX, double camY, double camZ) {
+		return true;
 	}
 
-	private static void cloudlet(VertexConsumer consumer, PoseStack poseStack, float x, float y, float z, int r, int g, int b, int a, float size) {
+	public void render(EntityNukeEffects ent, float p_114600_, float p_114601_, PoseStack poseStack, MultiBufferSource bufferSource, int light) {
+		VertexConsumer cloudletVertexConsumer = bufferSource.getBuffer(CLOUDLET_RENDER_TYPE);
+
+		for (Cloudlet c : ent.cloudlets) {
+			billboard(cloudletVertexConsumer, poseStack, (float) c.pos.x, (float) c.pos.y, (float) c.pos.z, c.r, c.g, c.b, c.a, c.getScale());
+		}
+		VertexConsumer flashVertexConsumer = bufferSource.getBuffer(FLASH_RENDER_TYPE);
+		billboard(flashVertexConsumer, poseStack, 0, 0, 0, 255, 255, 255, Math.max(255 - (int)(ent.age * 255f / ent.type.getHandler().getFlashDuration()), 0), ent.type.getHandler().getFlashSize());
+	}
+
+	private void billboard(VertexConsumer consumer, PoseStack poseStack, float x, float y, float z, int r, int g, int b, int a, float size) {
 		poseStack.pushPose();
 		poseStack.translate(x, y, z);
+		poseStack.mulPose(entityRenderDispatcher.cameraOrientation());
 		PoseStack.Pose pose = poseStack.last();
 		vertex(consumer, pose, -0.5F * size, -0.5F * size, r, g, b, a, 0, 1, 15728880);
 		vertex(consumer, pose, 0.5F * size, -0.5F * size, r, g, b, a, 1, 1, 15728880);

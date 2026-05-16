@@ -14,6 +14,10 @@ public class MiArmoryRenderTypes {
 		return CLOUDLET.apply(texture);
 	}
 
+	public static RenderType flash(ResourceLocation texture) {
+		return FLASH.apply(texture);
+	}
+
 	private static final Function<ResourceLocation, RenderType> CLOUDLET = texture -> {
 		RenderType.CompositeState rendertype$compositestate = RenderType.CompositeState.builder()
 				.setShaderState(RenderStateShard.POSITION_COLOR_TEX_LIGHTMAP_SHADER)
@@ -21,10 +25,32 @@ public class MiArmoryRenderTypes {
 				.setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
 				.setLightmapState(RenderStateShard.LIGHTMAP)
 				.setOverlayState(RenderStateShard.OVERLAY)
-				.setWriteMaskState(RenderStateShard.COLOR_WRITE)
+				.setCullState(RenderStateShard.NO_CULL)
+				.setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
 				.createCompositeState(false);
 		return RenderType.create(
 				"cloudlet",
+				DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP,
+				VertexFormat.Mode.QUADS,
+				1536,
+				true,
+				false,
+				rendertype$compositestate
+		);
+	};
+
+	private static final Function<ResourceLocation, RenderType> FLASH = texture -> {
+		RenderType.CompositeState rendertype$compositestate = RenderType.CompositeState.builder()
+				.setShaderState(RenderStateShard.POSITION_COLOR_TEX_LIGHTMAP_SHADER)
+				.setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
+				.setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
+				.setDepthTestState(RenderStateShard.NO_DEPTH_TEST)
+				.setLightmapState(RenderStateShard.LIGHTMAP)
+				.setOverlayState(RenderStateShard.OVERLAY)
+				.setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
+				.createCompositeState(false);
+		return RenderType.create(
+				"flash",
 				DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP,
 				VertexFormat.Mode.QUADS,
 				1536,

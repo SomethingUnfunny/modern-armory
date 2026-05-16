@@ -8,18 +8,51 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.ranch.mi_armory.MiArmoryConstants;
+import org.ranch.mi_armory.rendering.nuke.NukeExplosionType;
+import org.ranch.mi_armory.rendering.nuke.handlers.NukeParticleHandler;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class EntityNukeEffects extends Entity {
 
-	public ExplosionType type;
+	public NukeExplosionType type;
+	public int age;
+	private Random rng;
 
 	public ArrayList<Cloudlet> cloudlets = new ArrayList();
 
 	public EntityNukeEffects(EntityType<?> entityType, Level level) {
 		super(entityType, level);
 		type = getExplosionType(level, getOnPos());
+		age = 0;
+		rng = new Random();
+	}
+
+	@Override
+	public boolean shouldRenderAtSqrDistance(double distance) {
+		return true;
+	}
+
+	@Override
+	public void tick() {
+		super.tick();
+		NukeParticleHandler handler = type.getHandler();
+		handler.updateCloudlets(cloudlets, this.age, this, rng);
+		List<Cloudlet> toAdd = new ArrayList<>();
+		for (Cloudlet cloudlet : cloudlets) {
+			toAdd.addAll(handler.updateCloudlet(cloudlet, this, rng));
+			cloudlet.pos.add(cloudlet.vel);
+			cloudlet.life += 1;
+			if (cloudlet.life >= cloudlet.maxLife) cloudlet.dead = true;
+		}
+
+		cloudlets.addAll(toAdd);
+
+		cloudlets.removeIf(cloudlet -> cloudlet.dead);
+
+		age++;
 	}
 
 	@Override
@@ -37,10 +70,10 @@ public class EntityNukeEffects extends Entity {
 
 	}
 
-	private ExplosionType getExplosionType(Level world, BlockPos pos) {
+	private NukeExplosionType getExplosionType(Level world, BlockPos pos) {
 
 		if (pos.getY() > MiArmoryConstants.HIGH_ALTITUDE) {
-			return ExplosionType.EXOATMOSPHERIC;
+			return NukeExplosionType.EXOATMOSPHERIC;
 		}
 
 		int worldHeight = world.getChunk(pos).getHeight(Heightmap.Types.WORLD_SURFACE_WG, pos.getX() & 15, pos.getZ() & 15);
@@ -48,31 +81,22 @@ public class EntityNukeEffects extends Entity {
 		int altitude = pos.getY() - worldHeight;
 
 		if (worldHeight > oceanFloorHeight && world.isWaterAt(pos)) {
-			return ExplosionType.UNDERWATER;
+			return NukeExplosionType.UNDERWATER;
 		}
 
 		if (altitude < MiArmoryConstants.UNDERGROUND) {
-			return ExplosionType.UNDERGROUND;
+			return NukeExplosionType.UNDERGROUND;
 		}
 
 		if (altitude > MiArmoryConstants.UNDERGROUND && altitude < -5) {
-			return ExplosionType.CRATERING;
+			return NukeExplosionType.CRATERING;
 		}
 
 		if (pos.getY() - worldHeight > MiArmoryConstants.NO_STEM) {
-			return ExplosionType.ATMOSPHERIC;
+			return NukeExplosionType.ATMOSPHERIC;
 		} else {
-			return ExplosionType.ATMOSPHERIC_STEM;
+			return NukeExplosionType.ATMOSPHERIC_STEM;
 		}
 
-	}
-
-	public enum ExplosionType {
-		EXOATMOSPHERIC,
-		ATMOSPHERIC,
-		ATMOSPHERIC_STEM,
-		CRATERING,
-		UNDERWATER,
-		UNDERGROUND
 	}
 }
