@@ -18,10 +18,6 @@ public class EntityNukeExplosion extends EntityChunkloading {
 	RaycastExplosion explosion;
 	private Entity cause;
 
-	public EntityNukeExplosion(Level world) {
-		super(MiArmoryEntities.NUKE.get(), world);
-	}
-
 	public EntityNukeExplosion(EntityType<?> type, Level world) {
 		super(type, world);
 	}
@@ -54,7 +50,7 @@ public class EntityNukeExplosion extends EntityChunkloading {
 
 	public static EntityNukeExplosion create(Level world, int r, double x, double y, double z, Entity cause) {
 
-		EntityNukeExplosion mk5 = new EntityNukeExplosion(world);
+		EntityNukeExplosion mk5 = new EntityNukeExplosion(MiArmoryEntities.NUKE.get(), world);
 		mk5.strength = r;
 		mk5.cause = cause;
 		mk5.speed = (int)Math.ceil((double)100000.0F / (double)r);
