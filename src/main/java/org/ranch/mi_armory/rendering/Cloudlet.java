@@ -18,6 +18,8 @@ public class Cloudlet {
 	public int b;
 	public int a;
 
+	public int alphaFade;
+
 	public boolean dead;
 
 	public Cloudlet(Vector3d pos, Vector3d vel) {
@@ -46,19 +48,21 @@ public class Cloudlet {
 	}
 
 	public static class CloudletBuilder {
-		private final Vector3d pos;
-		private final Vector3d vel;
-		private int maxLife;
-		private float startingScale;
-		private float endingScale;
-		private float motionMultiplier;
+		protected final Vector3d pos;
+		protected final Vector3d vel;
+		protected int maxLife = Integer.MAX_VALUE;
+		protected float startingScale = 1;
+		protected float endingScale = 1;
+		protected float motionMultiplier = 1;
 
-		private int id;
+		protected int id = -1;
 
-		private int r;
-		private int g;
-		private int b;
-		private int a;
+		protected int r = 255;
+		protected int g = 255;
+		protected int b = 255;
+		protected int a = 100;
+
+		protected int alphaFade = 0;
 
 		public CloudletBuilder(Vector3d pos, Vector3d vel) {
 			this.pos = pos;
@@ -95,6 +99,11 @@ public class Cloudlet {
 			return this;
 		}
 
+		public CloudletBuilder alphaFade(int alphaFade) {
+			this.alphaFade = alphaFade;
+			return this;
+		}
+
 		public CloudletBuilder motionMultiplier(float motionMultiplier) {
 			this.motionMultiplier = motionMultiplier;
 			return this;
@@ -110,6 +119,7 @@ public class Cloudlet {
 			cloud.g = g;
 			cloud.b = b;
 			cloud.a = a;
+			cloud.alphaFade = alphaFade;
 			cloud.motionMultiplier = motionMultiplier;
 			return cloud;
 		}

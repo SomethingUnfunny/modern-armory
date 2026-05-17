@@ -1,16 +1,14 @@
 package org.ranch.mi_armory.rendering.nuke;
 
-import org.ranch.mi_armory.rendering.nuke.handlers.AbstractNukeAtmosphericParticleHandler;
-import org.ranch.mi_armory.rendering.nuke.handlers.NukeExoatmosphericParticleHandler;
-import org.ranch.mi_armory.rendering.nuke.handlers.NukeParticleHandler;
+import org.ranch.mi_armory.rendering.nuke.handlers.*;
 
 public enum NukeExplosionType {
 	EXOATMOSPHERIC(new NukeExoatmosphericParticleHandler()),
-	ATMOSPHERIC(null),
-	ATMOSPHERIC_STEM(null),
-	CRATERING(null),
-	UNDERWATER(null),
-	UNDERGROUND(null);
+	ATMOSPHERIC(new NukeAtmosphericParticleHandler()),
+	ATMOSPHERIC_STEM(new NukeAtmosphericStemParticleHandler()),
+	CRATERING(new NukeCrateringParticleHandler()),
+	UNDERWATER(new NukeUnderwaterParticleHandler()),
+	UNDERGROUND(new NukeUndergroundParticleHandler());
 
 	private final NukeParticleHandler handler;
 
@@ -19,6 +17,6 @@ public enum NukeExplosionType {
 	}
 
 	public NukeParticleHandler getHandler() {
-		return new AbstractNukeAtmosphericParticleHandler(); // hehe
+		return handler;
 	}
 }

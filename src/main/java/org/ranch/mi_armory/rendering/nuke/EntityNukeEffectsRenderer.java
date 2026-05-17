@@ -9,20 +9,26 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import org.joml.Vector3dc;
 import org.joml.Vector3f;
 import org.ranch.mi_armory.MiArmory;
 import org.ranch.mi_armory.MiArmoryRenderTypes;
 import org.ranch.mi_armory.rendering.Cloudlet;
 import org.ranch.mi_armory.rendering.EntityNukeEffects;
+import org.ranch.mi_armory.util.UnfunMath;
 
 public class EntityNukeEffectsRenderer extends EntityRenderer<EntityNukeEffects> {
 
 	private static final ResourceLocation CLOUDLET_TEXTURE = ResourceLocation.fromNamespaceAndPath(MiArmory.MODID, "textures/particle_base.png");
 	private static final ResourceLocation FLASH_TEXTURE = ResourceLocation.fromNamespaceAndPath(MiArmory.MODID, "textures/flare.png");
 
-	private static final RenderType CLOUDLET_RENDER_TYPE = RenderType.itemEntityTranslucentCull(CLOUDLET_TEXTURE);
+	private static final RenderType CLOUDLET_RENDER_TYPE = MiArmoryRenderTypes.cloudlet(CLOUDLET_TEXTURE);
+	//private static final RenderType CLOUDLET_RENDER_TYPE = RenderType.itemEntityTranslucentCull(CLOUDLET_TEXTURE);
 	private static final RenderType FLASH_RENDER_TYPE = MiArmoryRenderTypes.flash(FLASH_TEXTURE);
 
 
@@ -44,10 +50,17 @@ public class EntityNukeEffectsRenderer extends EntityRenderer<EntityNukeEffects>
 		VertexConsumer cloudletVertexConsumer = bufferSource.getBuffer(CLOUDLET_RENDER_TYPE);
 
 		for (Cloudlet c : ent.cloudlets) {
-			billboard(cloudletVertexConsumer, poseStack, (float) c.pos.x, (float) c.pos.y, (float) c.pos.z, c.r, c.g, c.b, c.a, c.getScale());
+
+			int alpha = (c.maxLife - c.life) < c.alphaFade
+					? (int)(c.a * (double)(c.maxLife - c.life) / c.alphaFade)
+					: c.a;
+
+			billboard(cloudletVertexConsumer, poseStack, (float) c.pos.x, (float) c.pos.y, (float) c.pos.z, c.r, c.g, c.b, alpha, c.getScale());
 		}
 		VertexConsumer flashVertexConsumer = bufferSource.getBuffer(FLASH_RENDER_TYPE);
-		billboard(flashVertexConsumer, poseStack, 0, 0, 0, 255, 255, 255, Math.max(255 - (int)(ent.age * 255f / ent.type.getHandler().getFlashDuration()), 0), ent.type.getHandler().getFlashSize());
+		BlockHitResult hit = ent.level().clip(new ClipContext(entityRenderDispatcher.camera.getPosition(), ent.position(), ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, CollisionContext.empty()));
+		if (hit.getType() == HitResult.Type.MISS && ent.type != null)
+			billboard(flashVertexConsumer, poseStack, 0, 0, 0, 255, 255, 255, Math.max(255 - (int)(ent.age * 255f / ent.type.getHandler().getFlashDuration()), 0), ent.type.getHandler().getFlashSize());
 	}
 
 	private void billboard(VertexConsumer consumer, PoseStack poseStack, float x, float y, float z, int r, int g, int b, int a, float size) {

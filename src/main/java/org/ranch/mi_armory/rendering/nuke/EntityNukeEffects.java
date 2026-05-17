@@ -7,6 +7,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.AABB;
 import org.ranch.mi_armory.MiArmoryConstants;
 import org.ranch.mi_armory.rendering.nuke.NukeExplosionType;
 import org.ranch.mi_armory.rendering.nuke.handlers.NukeParticleHandler;
@@ -25,9 +26,9 @@ public class EntityNukeEffects extends Entity {
 
 	public EntityNukeEffects(EntityType<?> entityType, Level level) {
 		super(entityType, level);
-		type = getExplosionType(level, getOnPos());
 		age = 0;
 		rng = new Random();
+		noCulling = true;
 	}
 
 	@Override
@@ -37,12 +38,18 @@ public class EntityNukeEffects extends Entity {
 
 	@Override
 	public void tick() {
+
+		if (type == null)
+			type = getExplosionType(level(), BlockPos.containing(position()));
+
 		super.tick();
 		NukeParticleHandler handler = type.getHandler();
+		if (handler == null) return;
 		handler.updateCloudlets(cloudlets, this.age, this, rng);
 		List<Cloudlet> toAdd = new ArrayList<>();
 		for (Cloudlet cloudlet : cloudlets) {
 			toAdd.addAll(handler.updateCloudlet(cloudlet, this, rng));
+			cloudlet.vel.mul(cloudlet.motionMultiplier);
 			cloudlet.pos.add(cloudlet.vel);
 			cloudlet.life += 1;
 			if (cloudlet.life >= cloudlet.maxLife) cloudlet.dead = true;
@@ -76,11 +83,11 @@ public class EntityNukeEffects extends Entity {
 			return NukeExplosionType.EXOATMOSPHERIC;
 		}
 
-		int worldHeight = world.getChunk(pos).getHeight(Heightmap.Types.WORLD_SURFACE_WG, pos.getX() & 15, pos.getZ() & 15);
-		int oceanFloorHeight = world.getChunk(pos).getHeight(Heightmap.Types.OCEAN_FLOOR_WG, pos.getX() & 15, pos.getZ() & 15);
+		int worldHeight = world.getChunk(pos).getHeight(Heightmap.Types.WORLD_SURFACE, pos.getX() & 15, pos.getZ() & 15);
+		int oceanFloorHeight = world.getChunk(pos).getHeight(Heightmap.Types.OCEAN_FLOOR, pos.getX() & 15, pos.getZ() & 15);
 		int altitude = pos.getY() - worldHeight;
 
-		if (worldHeight > oceanFloorHeight && world.isWaterAt(pos)) {
+		if (/*worldHeight > oceanFloorHeight && */world.isWaterAt(pos)) {
 			return NukeExplosionType.UNDERWATER;
 		}
 
@@ -92,7 +99,7 @@ public class EntityNukeEffects extends Entity {
 			return NukeExplosionType.CRATERING;
 		}
 
-		if (pos.getY() - worldHeight > MiArmoryConstants.NO_STEM) {
+		if (altitude > MiArmoryConstants.NO_STEM) {
 			return NukeExplosionType.ATMOSPHERIC;
 		} else {
 			return NukeExplosionType.ATMOSPHERIC_STEM;

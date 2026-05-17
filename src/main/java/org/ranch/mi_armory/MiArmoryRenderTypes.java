@@ -23,9 +23,10 @@ public class MiArmoryRenderTypes {
 				.setShaderState(RenderStateShard.POSITION_COLOR_TEX_LIGHTMAP_SHADER)
 				.setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
 				.setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
+				.setOutputState(RenderStateShard.TRANSLUCENT_TARGET)
 				.setLightmapState(RenderStateShard.LIGHTMAP)
 				.setOverlayState(RenderStateShard.OVERLAY)
-				.setCullState(RenderStateShard.NO_CULL)
+				//.setCullState(RenderStateShard.NO_CULL)
 				.setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
 				.createCompositeState(false);
 		return RenderType.create(
@@ -34,7 +35,7 @@ public class MiArmoryRenderTypes {
 				VertexFormat.Mode.QUADS,
 				1536,
 				true,
-				false,
+				true,
 				rendertype$compositestate
 		);
 	};
