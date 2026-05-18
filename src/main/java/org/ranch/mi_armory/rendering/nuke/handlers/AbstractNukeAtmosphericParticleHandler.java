@@ -34,17 +34,18 @@ public abstract class AbstractNukeAtmosphericParticleHandler implements NukePart
 	}
 
 	protected double getHeat(int age) {
-		int maxAge = getMaxAge();
+		int maxAge = maxAge();
 		int maxHeat = (int) (50.0 * CS);
 		return maxHeat - Math.pow((double) (maxHeat * age) / Math.max(maxAge, 1), 1.0);
 	}
 
-	protected int getMaxAge() {
+	@Override
+	public int maxAge() {
 		return (int) (900.0 * S);
 	}
 
 	protected double getSimulationSpeed(int age) {
-		int maxAge = getMaxAge();
+		int maxAge = maxAge();
 		int simSlow = maxAge / 4;
 		int simStop = maxAge / 2;
 		if (age > simStop) return 0.0;
@@ -53,13 +54,13 @@ public abstract class AbstractNukeAtmosphericParticleHandler implements NukePart
 	}
 
 	protected double getGreying(int age) {
-		int maxAge = getMaxAge();
+		int maxAge = maxAge();
 		int greyStart = maxAge * 3 / 4;
 		return age > greyStart ? 1.0 + (double) (age - greyStart) / (maxAge - greyStart) : 1.0;
 	}
 
 	protected float getGlobalAlpha(int age) {
-		int maxAge = getMaxAge();
+		int maxAge = maxAge();
 		int fadeOut = maxAge * 3 / 4;
 		if (age > fadeOut) {
 			float fac = (float) (age - fadeOut) / (float) (maxAge - fadeOut);
@@ -79,7 +80,7 @@ public abstract class AbstractNukeAtmosphericParticleHandler implements NukePart
 
 	@Override
 	public void updateCloudlets(List<Cloudlet> cloudlets, int age, EntityNukeEffects ent, Random rng) {
-		int maxAge = getMaxAge();
+		int maxAge = maxAge();
 		double simSpeed = getSimulationSpeed(age);
 		double coreHeight = getCoreHeight(age);
 		double torusWidth = getTorusWidth(age);

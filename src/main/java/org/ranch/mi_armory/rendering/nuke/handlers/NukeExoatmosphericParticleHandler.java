@@ -20,7 +20,13 @@ public class NukeExoatmosphericParticleHandler implements NukeParticleHandler {
 			while (iterator.hasNext()) {
 				Vector2d sPoint = iterator.next();
 				Vector3d cPoint = UnfunMath.sphericalToCartesian(sPoint);
-				cloudlets.add(Cloudlet.of(new Vector3d(), cPoint).scale(4).build());
+				cloudlets.add(
+						Cloudlet.of(new Vector3d(), cPoint)
+								.scale(4)
+								.maxLife(600)
+								.alphaFade(100)
+								.build()
+				);
 			}
 		}
 	}
@@ -39,5 +45,10 @@ public class NukeExoatmosphericParticleHandler implements NukeParticleHandler {
 	@Override
 	public int getFlashDuration() {
 		return 40;
+	}
+
+	@Override
+	public int maxAge() {
+		return 600;
 	}
 }

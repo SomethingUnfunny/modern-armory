@@ -8,7 +8,10 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.ranch.mi_armory.MiArmoryConstants;
+import org.ranch.mi_armory.MiArmoryEntities;
+import org.ranch.mi_armory.explosions.EntityNukeExplosion;
 import org.ranch.mi_armory.rendering.nuke.NukeExplosionType;
 import org.ranch.mi_armory.rendering.nuke.handlers.NukeParticleHandler;
 
@@ -59,6 +62,10 @@ public class EntityNukeEffects extends Entity {
 
 		cloudlets.removeIf(cloudlet -> cloudlet.dead);
 
+		if (age >= handler.maxAge()) {
+			remove(RemovalReason.DISCARDED);
+		}
+
 		age++;
 	}
 
@@ -87,7 +94,7 @@ public class EntityNukeEffects extends Entity {
 		int oceanFloorHeight = world.getChunk(pos).getHeight(Heightmap.Types.OCEAN_FLOOR, pos.getX() & 15, pos.getZ() & 15);
 		int altitude = pos.getY() - worldHeight;
 
-		if (/*worldHeight > oceanFloorHeight && */world.isWaterAt(pos)) {
+		if (worldHeight > oceanFloorHeight && world.isWaterAt(pos)) {
 			return NukeExplosionType.UNDERWATER;
 		}
 
@@ -105,5 +112,11 @@ public class EntityNukeEffects extends Entity {
 			return NukeExplosionType.ATMOSPHERIC_STEM;
 		}
 
+	}
+
+	public static EntityNukeEffects create(Vec3 pos, Level world, float size) {
+		EntityNukeEffects effects = new EntityNukeEffects(MiArmoryEntities.TOREX.get(), world);
+		effects.setPos(pos);
+		return effects;
 	}
 }

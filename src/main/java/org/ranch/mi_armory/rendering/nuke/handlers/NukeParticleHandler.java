@@ -15,4 +15,6 @@ public interface NukeParticleHandler {
 	float getFlashSize();
 
 	int getFlashDuration();
+
+	int maxAge();
 }

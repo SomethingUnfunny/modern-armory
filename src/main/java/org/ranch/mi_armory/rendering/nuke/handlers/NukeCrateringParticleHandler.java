@@ -27,4 +27,9 @@ public class NukeCrateringParticleHandler implements NukeParticleHandler {
 	public int getFlashDuration() {
 		return 0;
 	}
+
+	@Override
+	public int maxAge() {
+		return 0;
+	}
 }

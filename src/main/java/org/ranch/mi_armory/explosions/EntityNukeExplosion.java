@@ -6,6 +6,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3i;
 import org.ranch.mi_armory.MiArmoryEntities;
 
@@ -34,7 +35,7 @@ public class EntityNukeExplosion extends EntityChunkloading {
 		loadChunk(this.getBlockX() >> 4, this.getBlockZ() >> 4);
 
 		if (!explosion.castingComplete) {
-			explosion.castPoints(10000);
+			explosion.castPoints(speed);
 		} else if (!explosion.removingComplete) {
 			explosion.processChunk();
 		} else {
@@ -48,13 +49,12 @@ public class EntityNukeExplosion extends EntityChunkloading {
 	protected void addAdditionalSaveData(CompoundTag compoundTag) {
 	}
 
-	public static EntityNukeExplosion create(Level world, int r, double x, double y, double z, Entity cause) {
-
+	public static EntityNukeExplosion create(Vec3 pos, Level world, int r, Entity cause) {
 		EntityNukeExplosion mk5 = new EntityNukeExplosion(MiArmoryEntities.NUKE.get(), world);
 		mk5.strength = r;
 		mk5.cause = cause;
-		mk5.speed = (int)Math.ceil((double)100000.0F / (double)r);
-		mk5.setPos(x, y, z);
+		mk5.speed = (int)(1000000.0 / r);
+		mk5.setPos(pos);
 		mk5.range = r / 2;
 		return mk5;
 	}

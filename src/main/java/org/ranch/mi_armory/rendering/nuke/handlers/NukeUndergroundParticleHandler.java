@@ -26,4 +26,9 @@ public class NukeUndergroundParticleHandler implements NukeParticleHandler {
 	public int getFlashDuration() {
 		return 0;
 	}
+
+	@Override
+	public int maxAge() {
+		return 0;
+	}
 }
