@@ -17,8 +17,4 @@ public class UnfunMath {
 		double e = Math.pow(x / a, 2) * -0.5;
 		return m * Math.pow(Math.E, e);
 	}
-
-	public static double lerp(double a, double b, double t) {
-		return a + (b - a) * t;
-	}
 }

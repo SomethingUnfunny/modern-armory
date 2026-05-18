@@ -419,12 +419,12 @@ public abstract class AbstractNukeAtmosphericParticleHandler implements NukePart
 
 	@Override
 	public float getFlashSize() {
-		return 100;
+		return 150;
 	}
 
 	@Override
 	public int getFlashDuration() {
-		return 40;
+		return 50;
 	}
 
 	public static class TorusCloudlet extends Cloudlet {

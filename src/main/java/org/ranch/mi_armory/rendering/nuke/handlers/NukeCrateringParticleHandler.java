@@ -11,7 +11,6 @@ public class NukeCrateringParticleHandler implements NukeParticleHandler {
 	@Override
 	public void updateCloudlets(List<Cloudlet> cloudlets, int age, EntityNukeEffects ent, Random rng) {
 
-
 	}
 
 	@Override
