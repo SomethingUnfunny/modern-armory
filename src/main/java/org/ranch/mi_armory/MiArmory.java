@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -31,8 +32,8 @@ public class MiArmory {
 		modEventBus.addListener(this::commonSetup);
 
 		MiArmoryEntities.register(modEventBus);
-
-		NeoForge.EVENT_BUS.register(this);
+		MiArmoryItems.register(modEventBus);
+		MiArmoryComponents.register(modEventBus);
 
 		// Register our mod's ModConfigSpec so that FML can create and load the config file for us
 		modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -51,9 +52,12 @@ public class MiArmory {
 		}
 	}
 
-	public static void decimate(BlockPos pos, int strength, boolean visuals, Entity cause, ServerLevel level) {
-		EntityNukeExplosion explosion = EntityNukeExplosion.create(pos.getBottomCenter(), level, strength, cause);
-		level.addFreshEntity(explosion);
+	public static void decimate(BlockPos pos, int strength, boolean visuals, Entity cause, Level level) {
+		if (!level.isClientSide()) {
+			EntityNukeExplosion explosion = EntityNukeExplosion.create(pos.getBottomCenter(), level, strength, cause);
+			level.addFreshEntity(explosion);
+		}
+
 		if (visuals) {
 			EntityNukeEffects effects = EntityNukeEffects.create(pos.getBottomCenter(), level, strength);
 			level.addFreshEntity(effects);

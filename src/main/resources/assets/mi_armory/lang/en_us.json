@@ -1,5 +1,6 @@
 {
-  "itemGroup.mi_armory": "Example Mod Tab",
-  "block.mi_armory.example_block": "Example Block",
-  "item.mi_armory.example_item": "Example Item"
+  "itemGroup.mi_armory": "MI Armory",
+  "item.mi_armory.detonator": "Detonator",
+  "detonator.tooltip": "Linked with nuke at:",
+  "detonator.message": "Linked Nuke"
 }

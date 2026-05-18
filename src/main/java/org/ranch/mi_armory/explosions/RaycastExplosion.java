@@ -124,7 +124,7 @@ public class RaycastExplosion {
 						inChunk = true;
 						BlockPos blockPos = new BlockPos(x, y, z);
 
-						level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 1);
+						level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
 					} else if (inChunk) {
 						break;
 					}

@@ -1,9 +1,12 @@
 package org.ranch.mi_armory.explosions;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -29,14 +32,17 @@ public class EntityNukeExplosion extends EntityChunkloading {
 	public void tick() {
 		super.tick();
 		if (explosion == null) {
-			this.explosion = new RaycastExplosion(this.level(), new Vector3i(this.getBlockX(), this.getBlockY(), this.getBlockZ()), 100, 100);
+			this.explosion = new RaycastExplosion(this.level(), new Vector3i(this.getBlockX(), this.getBlockY(), this.getBlockZ()), strength, range);
 		}
 
 		loadChunk(this.getBlockX() >> 4, this.getBlockZ() >> 4);
 
 		if (!explosion.castingComplete) {
-			explosion.castPoints(speed);
+			explosion.castPoints(10000);
 		} else if (!explosion.removingComplete) {
+			explosion.processChunk();
+			explosion.processChunk();
+			explosion.processChunk();
 			explosion.processChunk();
 		} else {
 			this.remove(RemovalReason.DISCARDED);
@@ -51,11 +57,11 @@ public class EntityNukeExplosion extends EntityChunkloading {
 
 	public static EntityNukeExplosion create(Vec3 pos, Level world, int r, Entity cause) {
 		EntityNukeExplosion mk5 = new EntityNukeExplosion(MiArmoryEntities.NUKE.get(), world);
-		mk5.strength = r;
+		mk5.strength = r / 2;
 		mk5.cause = cause;
 		mk5.speed = (int)(1000000.0 / r);
 		mk5.setPos(pos);
-		mk5.range = r / 2;
+		mk5.range = r;
 		return mk5;
 	}
 }
