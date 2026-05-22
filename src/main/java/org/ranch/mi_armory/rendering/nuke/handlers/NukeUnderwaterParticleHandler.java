@@ -6,6 +6,7 @@ import org.ranch.mi_armory.rendering.Cloudlet;
 import org.ranch.mi_armory.rendering.nuke.EntityNukeEffects;
 import org.ranch.mi_armory.util.GSPIterator;
 import org.ranch.mi_armory.util.UnfunMath;
+
 import java.util.List;
 import java.util.Random;
 
@@ -65,12 +66,12 @@ public class NukeUnderwaterParticleHandler implements NukeParticleHandler {
 				Vector2d sPoint = iterator.next();
 				Vector3d cPoint = UnfunMath.sphericalToCartesian(sPoint);
 				cloudlets.add(Cloudlet.of(new Vector3d(0, scale * 4, 0), cPoint.div(1))
-								.color(245, 245, 245, 150)
-								.scale(10, 5)
-								.id(WATER)
-								.alphaFade(10)
-								.maxLife(100)
-								.build()
+						.color(245, 245, 245, 150)
+						.scale(10, 5)
+						.id(WATER)
+						.alphaFade(10)
+						.maxLife(100)
+						.build()
 				);
 			}
 		}

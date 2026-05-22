@@ -10,7 +10,7 @@ import java.util.List;
 public record DetonatorSelections(List<DetonatorSelection> positions) {
 	public static final Codec<DetonatorSelections> CODEC = RecordCodecBuilder.create(
 			(instance) -> instance.group(
-					DetonatorSelection.CODEC.listOf().fieldOf("targets").forGetter(DetonatorSelections::positions))
+							DetonatorSelection.CODEC.listOf().fieldOf("targets").forGetter(DetonatorSelections::positions))
 					.apply(instance, DetonatorSelections::new)
 	);
 

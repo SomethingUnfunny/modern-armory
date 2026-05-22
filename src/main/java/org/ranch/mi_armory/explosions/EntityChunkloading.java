@@ -1,12 +1,10 @@
 package org.ranch.mi_armory.explosions;
 
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.TicketType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.chunk.status.ChunkStatus;
 
 public abstract class EntityChunkloading extends Entity {
 	private ChunkPos loadedChunk;
@@ -36,14 +34,14 @@ public abstract class EntityChunkloading extends Entity {
 
 	public void clearChunkLoader() {
 		if (!this.level().isClientSide && this.loadedChunk != null) {
-			ServerLevel world = (ServerLevel)this.level();
+			ServerLevel world = (ServerLevel) this.level();
 			world.setChunkForced(loadedChunk.x, loadedChunk.z, false);
 			this.loadedChunk = null;
 		}
 	}
 
 	private void forceChunk() {
-		ServerLevel world = (ServerLevel)this.level();
+		ServerLevel world = (ServerLevel) this.level();
 		world.setChunkForced(loadedChunk.x, loadedChunk.z, true);
 	}
 

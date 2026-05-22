@@ -9,22 +9,17 @@ import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import org.joml.Vector3dc;
-import org.joml.Vector3f;
 import org.ranch.mi_armory.MiArmory;
 import org.ranch.mi_armory.MiArmoryRenderTypes;
 import org.ranch.mi_armory.MiArmorySounds;
 import org.ranch.mi_armory.rendering.Cloudlet;
-import org.ranch.mi_armory.util.UnfunMath;
 
 public class EntityNukeEffectsRenderer extends EntityRenderer<EntityNukeEffects> {
 
@@ -56,7 +51,7 @@ public class EntityNukeEffectsRenderer extends EntityRenderer<EntityNukeEffects>
 		for (Cloudlet c : ent.cloudlets) {
 
 			int alpha = (c.maxLife - c.life) < c.alphaFade
-					? (int)(c.a * (double)(c.maxLife - c.life) / c.alphaFade)
+					? (int) (c.a * (double) (c.maxLife - c.life) / c.alphaFade)
 					: c.a;
 
 			billboard(cloudletVertexConsumer, poseStack, (float) c.pos.x, (float) c.pos.y, (float) c.pos.z, c.r, c.g, c.b, alpha, c.getScale());
@@ -64,7 +59,7 @@ public class EntityNukeEffectsRenderer extends EntityRenderer<EntityNukeEffects>
 		VertexConsumer flashVertexConsumer = bufferSource.getBuffer(FLASH_RENDER_TYPE);
 		BlockHitResult hit = ent.level().clip(new ClipContext(entityRenderDispatcher.camera.getPosition(), ent.position(), ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, CollisionContext.empty()));
 		if (hit.getType() == HitResult.Type.MISS && ent.type != null)
-			billboard(flashVertexConsumer, poseStack, 0, 0, 0, 255, 255, 255, Math.max(255 - (int)(ent.age * 255f / ent.type.getHandler().getFlashDuration()), 0), ent.type.getHandler().getFlashSize());
+			billboard(flashVertexConsumer, poseStack, 0, 0, 0, 255, 255, 255, Math.max(255 - (int) (ent.age * 255f / ent.type.getHandler().getFlashDuration()), 0), ent.type.getHandler().getFlashSize());
 
 		Player player = Minecraft.getInstance().player;
 		if (player != null) {

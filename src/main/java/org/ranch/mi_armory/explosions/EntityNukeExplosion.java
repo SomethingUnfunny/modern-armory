@@ -1,22 +1,16 @@
 package org.ranch.mi_armory.explosions;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3i;
 import org.ranch.mi_armory.MiArmoryEntities;
 import org.ranch.mi_armory.network.PacketDetonation;
-
-import java.util.ArrayList;
 
 public class EntityNukeExplosion extends EntityChunkloading {
 	public int strength;
@@ -66,7 +60,7 @@ public class EntityNukeExplosion extends EntityChunkloading {
 		EntityNukeExplosion mk5 = new EntityNukeExplosion(MiArmoryEntities.NUKE.get(), world);
 		mk5.strength = r * 2;
 		mk5.cause = cause;
-		mk5.speed = (int)(1000000.0 / r);
+		mk5.speed = (int) (1000000.0 / r);
 		mk5.setPos(pos);
 		mk5.range = r;
 		return mk5;

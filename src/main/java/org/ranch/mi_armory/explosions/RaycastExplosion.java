@@ -5,10 +5,12 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import org.joml.*;
+import org.joml.Vector2d;
+import org.joml.Vector3d;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.ranch.mi_armory.util.GSPIterator;
 
-import java.lang.Math;
 import java.util.*;
 
 import static org.ranch.mi_armory.util.UnfunMath.sphericalToCartesian;

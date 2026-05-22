@@ -13,7 +13,7 @@ public class UnfunMath {
 
 	public static double normal(double x, double a) {
 		double s = Math.sqrt(2 * Math.PI);
-		double m = (1/(a * s));
+		double m = (1 / (a * s));
 		double e = Math.pow(x / a, 2) * -0.5;
 		return m * Math.pow(Math.E, e);
 	}
