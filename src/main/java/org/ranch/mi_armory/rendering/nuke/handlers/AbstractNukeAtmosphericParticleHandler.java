@@ -1,8 +1,9 @@
 package org.ranch.mi_armory.rendering.nuke.handlers;
 
 import org.joml.Vector3d;
+import org.ranch.mi_armory.MiArmory;
 import org.ranch.mi_armory.rendering.Cloudlet;
-import org.ranch.mi_armory.rendering.EntityNukeEffects;
+import org.ranch.mi_armory.rendering.nuke.EntityNukeEffects;
 
 import java.util.List;
 import java.util.Random;
@@ -116,7 +117,7 @@ public abstract class AbstractNukeAtmosphericParticleHandler implements NukePart
 
 			for (int i = 0; i < cloudCount; i++) {
 				float rot = (float) (Math.PI * 2 * rng.nextDouble());
-				double dist = (age * 1.5 + rng.nextDouble()) * 1.5;
+				double dist = MiArmory.speedOfSound(age);
 				double sx = Math.cos(rot) * dist;
 				double sz = Math.sin(rot) * dist;
 				int sy = getSimGroundHeight((int) sx, (int) sz, ent);

@@ -1,0 +1,13 @@
+{
+  "nuclear_explosion": {
+    "sounds": [
+      "mi_armory:nuclear_explosion"
+    ]
+  },
+  "emi": {
+    "sounds": [
+      "mi_armory:emi"
+    ]
+  }
+}
+

@@ -4,8 +4,11 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.TicketType;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -17,8 +20,12 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handlers.ServerPayloadHandler;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.ranch.mi_armory.explosions.EntityNukeExplosion;
-import org.ranch.mi_armory.rendering.EntityNukeEffects;
+import org.ranch.mi_armory.network.PacketDetonation;
+import org.ranch.mi_armory.rendering.nuke.EntityNukeEffects;
 import org.ranch.mi_armory.rendering.nuke.EntityNukeEffectsRenderer;
 import org.slf4j.Logger;
 
@@ -34,13 +41,32 @@ public class MiArmory {
 		MiArmoryEntities.register(modEventBus);
 		MiArmoryItems.register(modEventBus);
 		MiArmoryComponents.register(modEventBus);
+		MiArmorySounds.register(modEventBus);
 
 		// Register our mod's ModConfigSpec so that FML can create and load the config file for us
 		modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 	}
 
+	public static ResourceLocation location(String path) {
+		return ResourceLocation.fromNamespaceAndPath(MODID, path);
+	}
+
+	public static double speedOfSound(int tick) {
+		return (tick * 1.5) * 1.5;
+	}
+
 	private void commonSetup(final FMLCommonSetupEvent event) {
 		// Some common setup code
+	}
+
+	@EventBusSubscriber(modid = MODID)
+	public static class ModEvents {
+		@SubscribeEvent
+		public static void register(final RegisterPayloadHandlersEvent event) {
+			final PayloadRegistrar registrar = event.registrar(MODID).versioned("1");
+
+			registrar.playToClient(PacketDetonation.TYPE, PacketDetonation.STREAM_CODEC, PacketDetonation::handle);
+		}
 	}
 
 	@EventBusSubscriber(modid = MODID, value = Dist.CLIENT)
@@ -53,9 +79,10 @@ public class MiArmory {
 	}
 
 	public static void decimate(BlockPos pos, int strength, boolean visuals, Entity cause, Level level) {
-		if (!level.isClientSide()) {
+		if (!level.isClientSide() && level instanceof ServerLevel sLevel) {
 			EntityNukeExplosion explosion = EntityNukeExplosion.create(pos.getBottomCenter(), level, strength, cause);
 			level.addFreshEntity(explosion);
+			explosion.loadChunk();
 		}
 
 		if (visuals) {

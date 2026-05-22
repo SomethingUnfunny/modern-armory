@@ -1,6 +1,6 @@
 package org.ranch.mi_armory.rendering.nuke.handlers;
 
-import org.ranch.mi_armory.rendering.EntityNukeEffects;
+import org.ranch.mi_armory.rendering.nuke.EntityNukeEffects;
 
 public class NukeAtmosphericStemParticleHandler extends AbstractNukeAtmosphericParticleHandler {
 	@Override

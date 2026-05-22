@@ -15,29 +15,36 @@ public abstract class EntityChunkloading extends Entity {
 		super(type, world);
 	}
 
+	public void loadChunk() {
+		loadChunk(getBlockX() >> 4, getBlockZ() >> 4);
+	}
+
 	public void loadChunk(int x, int z) {
 		if (!this.level().isClientSide) {
 			ChunkPos chunkPos = new ChunkPos(x, z);
-			if (this.loadedChunk == null || !this.loadedChunk.equals(chunkPos)) {
-				this.loadedChunk = chunkPos;
-				this.forceChunk();
-			}
-		}
 
+			if (this.loadedChunk == null) this.loadedChunk = chunkPos;
+
+			if (!this.loadedChunk.equals(chunkPos)) {
+				clearChunkLoader();
+				this.loadedChunk = chunkPos;
+			}
+
+			this.forceChunk();
+		}
 	}
 
 	public void clearChunkLoader() {
 		if (!this.level().isClientSide && this.loadedChunk != null) {
 			ServerLevel world = (ServerLevel)this.level();
-			world.getChunkSource().removeRegionTicket(TicketType.FORCED, this.loadedChunk, 3, this.loadedChunk);
+			world.setChunkForced(loadedChunk.x, loadedChunk.z, false);
 			this.loadedChunk = null;
 		}
-
 	}
 
 	private void forceChunk() {
 		ServerLevel world = (ServerLevel)this.level();
-		world.getChunkSource().addRegionTicket(TicketType.FORCED, loadedChunk, 3, this.loadedChunk);
+		world.setChunkForced(loadedChunk.x, loadedChunk.z, true);
 	}
 
 	public void remove(Entity.RemovalReason reason) {

@@ -8,7 +8,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.ranch.mi_armory.explosions.EntityNukeExplosion;
-import org.ranch.mi_armory.rendering.EntityNukeEffects;
+import org.ranch.mi_armory.rendering.nuke.EntityNukeEffects;
 
 import java.util.function.Supplier;
 

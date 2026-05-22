@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -36,7 +37,7 @@ public class DetonatorItem extends Item {
 			BlockPos selected = stack.get(MiArmoryComponents.DETONATOR_SELECTION).getBlockPos();
 			if (level.getBlockState(selected).getBlock() == MIBlock.NUKE.get()) {
 				level.setBlock(selected, Blocks.AIR.defaultBlockState(), 11);
-				MiArmory.decimate(selected, 140, true, player, level);
+				MiArmory.decimate(selected, 140, false, player, level);
 				stack.remove(MiArmoryComponents.DETONATOR_SELECTION);
 			}
 

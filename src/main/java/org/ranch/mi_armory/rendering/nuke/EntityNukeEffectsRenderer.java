@@ -2,13 +2,17 @@ package org.ranch.mi_armory.rendering.nuke;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -18,8 +22,8 @@ import org.joml.Vector3dc;
 import org.joml.Vector3f;
 import org.ranch.mi_armory.MiArmory;
 import org.ranch.mi_armory.MiArmoryRenderTypes;
+import org.ranch.mi_armory.MiArmorySounds;
 import org.ranch.mi_armory.rendering.Cloudlet;
-import org.ranch.mi_armory.rendering.EntityNukeEffects;
 import org.ranch.mi_armory.util.UnfunMath;
 
 public class EntityNukeEffectsRenderer extends EntityRenderer<EntityNukeEffects> {
@@ -61,6 +65,18 @@ public class EntityNukeEffectsRenderer extends EntityRenderer<EntityNukeEffects>
 		BlockHitResult hit = ent.level().clip(new ClipContext(entityRenderDispatcher.camera.getPosition(), ent.position(), ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, CollisionContext.empty()));
 		if (hit.getType() == HitResult.Type.MISS && ent.type != null)
 			billboard(flashVertexConsumer, poseStack, 0, 0, 0, 255, 255, 255, Math.max(255 - (int)(ent.age * 255f / ent.type.getHandler().getFlashDuration()), 0), ent.type.getHandler().getFlashSize());
+
+		Player player = Minecraft.getInstance().player;
+		if (player != null) {
+			if (player.distanceTo(ent) < MiArmory.speedOfSound(ent.age) && !ent.playedShockSound) {
+				ent.level().playLocalSound(ent.getOnPos(), MiArmorySounds.NUCLEAR_EXPLOSION.get(), SoundSource.BLOCKS, 1f, 1f, false);
+				ent.playedShockSound = true;
+			}
+			if (!ent.playedEMISound) {
+				ent.level().playLocalSound(ent.getOnPos(), MiArmorySounds.EMI.get(), SoundSource.BLOCKS, 2f, 1f, false);
+				ent.playedEMISound = true;
+			}
+		}
 	}
 
 	private void billboard(VertexConsumer consumer, PoseStack poseStack, float x, float y, float z, int r, int g, int b, int a, float size) {

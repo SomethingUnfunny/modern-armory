@@ -1,4 +1,4 @@
-package org.ranch.mi_armory.rendering;
+package org.ranch.mi_armory.rendering.nuke;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -12,6 +12,7 @@ import net.minecraft.world.phys.Vec3;
 import org.ranch.mi_armory.MiArmoryConstants;
 import org.ranch.mi_armory.MiArmoryEntities;
 import org.ranch.mi_armory.explosions.EntityNukeExplosion;
+import org.ranch.mi_armory.rendering.Cloudlet;
 import org.ranch.mi_armory.rendering.nuke.NukeExplosionType;
 import org.ranch.mi_armory.rendering.nuke.handlers.NukeParticleHandler;
 
@@ -24,6 +25,9 @@ public class EntityNukeEffects extends Entity {
 	public NukeExplosionType type;
 	public int age;
 	private Random rng;
+
+	public boolean playedShockSound = false;
+	public boolean playedEMISound = false;
 
 	public ArrayList<Cloudlet> cloudlets = new ArrayList();
 
