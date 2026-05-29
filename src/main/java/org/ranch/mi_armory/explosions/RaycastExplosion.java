@@ -97,7 +97,7 @@ public class RaycastExplosion {
 	}
 
 	public void processChunk() {
-		if (perChunk.isEmpty()) {
+		if (perChunk.isEmpty() || orderedChunks.isEmpty()) {
 			removingComplete = true;
 			return;
 		}

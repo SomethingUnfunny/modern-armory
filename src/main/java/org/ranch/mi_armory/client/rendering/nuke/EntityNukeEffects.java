@@ -1,4 +1,4 @@
-package org.ranch.mi_armory.rendering.nuke;
+package org.ranch.mi_armory.client.rendering.nuke;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -10,8 +10,8 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 import org.ranch.mi_armory.MiArmoryConstants;
 import org.ranch.mi_armory.MiArmoryEntities;
-import org.ranch.mi_armory.rendering.Cloudlet;
-import org.ranch.mi_armory.rendering.nuke.handlers.NukeParticleHandler;
+import org.ranch.mi_armory.client.rendering.Cloudlet;
+import org.ranch.mi_armory.client.rendering.nuke.handlers.NukeParticleHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +43,10 @@ public class EntityNukeEffects extends Entity {
 	@Override
 	public void tick() {
 
-		if (type == null)
-			type = getExplosionType(level(), BlockPos.containing(position()));
+		if (type == null) {
+			remove(RemovalReason.DISCARDED);
+			return;
+		}
 
 		super.tick();
 		NukeParticleHandler handler = type.getHandler();
@@ -82,36 +84,6 @@ public class EntityNukeEffects extends Entity {
 
 	@Override
 	protected void addAdditionalSaveData(CompoundTag compoundTag) {
-
-	}
-
-	private NukeExplosionType getExplosionType(Level world, BlockPos pos) {
-
-		if (pos.getY() > MiArmoryConstants.HIGH_ALTITUDE) {
-			return NukeExplosionType.EXOATMOSPHERIC;
-		}
-
-		int worldHeight = world.getChunk(pos).getHeight(Heightmap.Types.WORLD_SURFACE, pos.getX() & 15, pos.getZ() & 15);
-		int oceanFloorHeight = world.getChunk(pos).getHeight(Heightmap.Types.OCEAN_FLOOR, pos.getX() & 15, pos.getZ() & 15);
-		int altitude = pos.getY() - worldHeight;
-
-		if (worldHeight > oceanFloorHeight && world.isWaterAt(pos)) {
-			return NukeExplosionType.UNDERWATER;
-		}
-
-		if (altitude < MiArmoryConstants.UNDERGROUND) {
-			return NukeExplosionType.UNDERGROUND;
-		}
-
-		if (altitude > MiArmoryConstants.UNDERGROUND && altitude < -5) {
-			return NukeExplosionType.CRATERING;
-		}
-
-		if (altitude > MiArmoryConstants.NO_STEM) {
-			return NukeExplosionType.ATMOSPHERIC;
-		} else {
-			return NukeExplosionType.ATMOSPHERIC_STEM;
-		}
 
 	}
 

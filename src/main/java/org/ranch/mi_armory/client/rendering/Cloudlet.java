@@ -1,4 +1,4 @@
-package org.ranch.mi_armory.rendering;
+package org.ranch.mi_armory.client.rendering;
 
 import org.joml.Vector3d;
 

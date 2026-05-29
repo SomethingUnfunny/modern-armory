@@ -1,9 +1,9 @@
-package org.ranch.mi_armory.rendering.nuke.handlers;
+package org.ranch.mi_armory.client.rendering.nuke.handlers;
 
 import org.joml.Vector3d;
 import org.ranch.mi_armory.MiArmory;
-import org.ranch.mi_armory.rendering.Cloudlet;
-import org.ranch.mi_armory.rendering.nuke.EntityNukeEffects;
+import org.ranch.mi_armory.client.rendering.Cloudlet;
+import org.ranch.mi_armory.client.rendering.nuke.EntityNukeEffects;
 
 import java.util.List;
 import java.util.Random;

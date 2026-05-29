@@ -1,5 +1,6 @@
 package org.ranch.mi_armory.network;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -12,20 +13,24 @@ import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 import org.ranch.mi_armory.MiArmory;
+import org.ranch.mi_armory.client.MiArmoryClient;
+import org.ranch.mi_armory.client.rendering.nuke.NukeExplosionType;
 
-public record PacketDetonation(ChunkPos location, int strength) implements CustomPacketPayload {
+public record PacketDetonation(BlockPos location, int strength, NukeExplosionType explosionType) implements CustomPacketPayload {
 	public static final Type<PacketDetonation> TYPE = new Type<>(MiArmory.location("detonation"));
 
 	public static final StreamCodec<FriendlyByteBuf, PacketDetonation> STREAM_CODEC = StreamCodec.composite(
-			NeoForgeStreamCodecs.CHUNK_POS,
+			BlockPos.STREAM_CODEC,
 			PacketDetonation::location,
 			ByteBufCodecs.VAR_INT,
 			PacketDetonation::strength,
+			NeoForgeStreamCodecs.enumCodec(NukeExplosionType.class),
+			PacketDetonation::explosionType,
 			PacketDetonation::new
 	);
 
-	public static void sendToAllPlayers(ChunkPos location, int strength, ServerLevel dimension) {
-		PacketDistributor.sendToPlayersInDimension(dimension, new PacketDetonation(location, strength));
+	public static void sendToAllPlayers(BlockPos location, int strength, ServerLevel dimension, NukeExplosionType explosionType) {
+		PacketDistributor.sendToPlayersInDimension(dimension, new PacketDetonation(location, strength, explosionType));
 	}
 
 	@Override
@@ -34,7 +39,7 @@ public record PacketDetonation(ChunkPos location, int strength) implements Custo
 	}
 
 	public static void handle(PacketDetonation payload, IPayloadContext ctx) {
-		ctx.player().displayClientMessage(Component.literal("goot"), true);
-		// goot
+		MiArmoryClient.skyFlashRenderer.addFlash(payload, ctx);
+		// todo maybe a low rumble depending on distance
 	}
 }

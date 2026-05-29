@@ -1,4 +1,4 @@
-package org.ranch.mi_armory.rendering.nuke;
+package org.ranch.mi_armory.client.rendering.nuke;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -19,7 +19,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import org.ranch.mi_armory.MiArmory;
 import org.ranch.mi_armory.MiArmoryRenderTypes;
 import org.ranch.mi_armory.MiArmorySounds;
-import org.ranch.mi_armory.rendering.Cloudlet;
+import org.ranch.mi_armory.client.rendering.Cloudlet;
 
 public class EntityNukeEffectsRenderer extends EntityRenderer<EntityNukeEffects> {
 

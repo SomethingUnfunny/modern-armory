@@ -11,6 +11,13 @@ public class UnfunMath {
 		return new Vector3d(x, y, z);
 	}
 
+	public static Vector2d CartesianToSpherical(Vector3d point) {
+		double r = point.length();
+		double theta = Math.atan2(point.x, point.z) + Math.PI / 2;
+		double phi = Math.acos(point.y / r);
+		return new Vector2d(theta, phi);
+	}
+
 	public static double normal(double x, double a) {
 		double s = Math.sqrt(2 * Math.PI);
 		double m = (1 / (a * s));
