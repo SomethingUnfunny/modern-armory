@@ -2,16 +2,22 @@ package org.ranch.mi_armory.client.rendering.nuke;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
+import org.checkerframework.checker.units.qual.A;
+import org.ranch.mi_armory.MiArmory;
 import org.ranch.mi_armory.MiArmoryConstants;
 import org.ranch.mi_armory.MiArmoryEntities;
 import org.ranch.mi_armory.client.rendering.Cloudlet;
 import org.ranch.mi_armory.client.rendering.nuke.handlers.NukeParticleHandler;
+import org.ranch.mi_armory.explosions.EntityNukeExplosion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +25,12 @@ import java.util.Random;
 
 public class EntityNukeEffects extends Entity {
 
+	private static final EntityDataAccessor<Long> AGE = SynchedEntityData.defineId(EntityNukeEffects.class, EntityDataSerializers.LONG);
+
+	private final int MAX_CATCHUP = 400;
+
 	public NukeExplosionType type;
-	public int age;
+	public int simAge;
 	private Random rng;
 
 	public boolean playedShockSound = false;
@@ -30,7 +40,7 @@ public class EntityNukeEffects extends Entity {
 
 	public EntityNukeEffects(EntityType<?> entityType, Level level) {
 		super(entityType, level);
-		age = 0;
+		simAge = 0;
 		rng = new Random();
 		noCulling = true;
 	}
@@ -43,15 +53,31 @@ public class EntityNukeEffects extends Entity {
 	@Override
 	public void tick() {
 
+		if (entityData.get(AGE) > 20) playedEMISound = true;
+		if (entityData.get(AGE) > 200) playedShockSound = true;
+
 		if (type == null) {
-			remove(RemovalReason.DISCARDED);
-			return;
+			type = EntityNukeExplosion.getExplosionType(level(), BlockPos.containing(position()));
 		}
 
 		super.tick();
+
+		for (int i = 0; i < MAX_CATCHUP && entityData.get(AGE) > simAge; i++) {
+			tickSimulation();
+		}
+
+		if (simAge >= type.getHandler().maxAge()) {
+			remove(RemovalReason.DISCARDED);
+		}
+
+		entityData.set(AGE, entityData.get(AGE) + 1);
+	}
+
+	private void tickSimulation() {
+		if (!level().isClientSide) return;
+
 		NukeParticleHandler handler = type.getHandler();
-		if (handler == null) return;
-		handler.updateCloudlets(cloudlets, this.age, this, rng);
+		handler.updateCloudlets(cloudlets, this.simAge, this, rng);
 		List<Cloudlet> toAdd = new ArrayList<>();
 		for (Cloudlet cloudlet : cloudlets) {
 			toAdd.addAll(handler.updateCloudlet(cloudlet, this, rng));
@@ -64,27 +90,22 @@ public class EntityNukeEffects extends Entity {
 		cloudlets.addAll(toAdd);
 
 		cloudlets.removeIf(cloudlet -> cloudlet.dead);
-
-		if (age >= handler.maxAge()) {
-			remove(RemovalReason.DISCARDED);
-		}
-
-		age++;
+		simAge++;
 	}
 
 	@Override
 	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-
+		builder.define(AGE, 0L);
 	}
 
 	@Override
 	protected void readAdditionalSaveData(CompoundTag compoundTag) {
-
+		entityData.set(AGE, compoundTag.getLong("age"));
 	}
 
 	@Override
 	protected void addAdditionalSaveData(CompoundTag compoundTag) {
-
+		compoundTag.putLong("age", entityData.get(AGE));
 	}
 
 	public static EntityNukeEffects create(Vec3 pos, Level world, float size) {

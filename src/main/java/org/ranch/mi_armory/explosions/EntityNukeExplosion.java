@@ -37,8 +37,7 @@ public class EntityNukeExplosion extends EntityChunkloading {
 		super.tick();
 
 		if (type == null) {
-			remove(RemovalReason.DISCARDED);
-			return;
+			type = EntityNukeExplosion.getExplosionType(level(), BlockPos.containing(position()));
 		}
 
 		if (explosion == null) {

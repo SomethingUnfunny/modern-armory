@@ -216,7 +216,7 @@ public abstract class AbstractNukeAtmosphericParticleHandler implements NukePart
 	public List<Cloudlet> updateCloudlet(Cloudlet cloudlet, EntityNukeEffects ent, Random rng) {
 		if (!(cloudlet instanceof TorusCloudlet c)) return List.of();
 
-		int age = ent.age;
+		int age = ent.simAge;
 		double coreHeight = getCoreHeight(age);
 		double torusWidth = getTorusWidth(age);
 		double rollerSize = getRollerSize(age);

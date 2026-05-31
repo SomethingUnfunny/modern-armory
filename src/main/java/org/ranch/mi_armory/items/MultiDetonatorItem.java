@@ -48,7 +48,7 @@ public class MultiDetonatorItem extends DetonatorItem {
 			for (BlockPos selected : stack.get(MiArmoryComponents.DETONATOR_SELECTIONS).getBlockPosList()) {
 				if (level.getBlockState(selected).getBlock() == MIBlock.NUKE.get()) {
 					level.setBlock(selected, Blocks.AIR.defaultBlockState(), 11);
-					MiArmory.decimate(selected, 140, false, player, level);
+					MiArmory.decimate(selected, 140, true, player, level);
 				}
 			}
 

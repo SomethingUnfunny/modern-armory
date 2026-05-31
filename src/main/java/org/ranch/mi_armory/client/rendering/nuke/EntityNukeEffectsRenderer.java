@@ -27,7 +27,6 @@ public class EntityNukeEffectsRenderer extends EntityRenderer<EntityNukeEffects>
 	private static final ResourceLocation FLASH_TEXTURE = ResourceLocation.fromNamespaceAndPath(MiArmory.MODID, "textures/flare.png");
 
 	private static final RenderType CLOUDLET_RENDER_TYPE = MiArmoryRenderTypes.cloudlet(CLOUDLET_TEXTURE);
-	//private static final RenderType CLOUDLET_RENDER_TYPE = RenderType.itemEntityTranslucentCull(CLOUDLET_TEXTURE);
 	private static final RenderType FLASH_RENDER_TYPE = MiArmoryRenderTypes.flash(FLASH_TEXTURE);
 
 
@@ -59,11 +58,11 @@ public class EntityNukeEffectsRenderer extends EntityRenderer<EntityNukeEffects>
 		VertexConsumer flashVertexConsumer = bufferSource.getBuffer(FLASH_RENDER_TYPE);
 		BlockHitResult hit = ent.level().clip(new ClipContext(entityRenderDispatcher.camera.getPosition(), ent.position(), ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, CollisionContext.empty()));
 		if (hit.getType() == HitResult.Type.MISS && ent.type != null)
-			billboard(flashVertexConsumer, poseStack, 0, 0, 0, 255, 255, 255, Math.max(255 - (int) (ent.age * 255f / ent.type.getHandler().getFlashDuration()), 0), ent.type.getHandler().getFlashSize());
+			billboard(flashVertexConsumer, poseStack, 0, 0, 0, 255, 255, 255, Math.max(255 - (int) (ent.simAge * 255f / ent.type.getHandler().getFlashDuration()), 0), ent.type.getHandler().getFlashSize());
 
 		Player player = Minecraft.getInstance().player;
 		if (player != null) {
-			if (player.distanceTo(ent) < MiArmory.speedOfSound(ent.age) && !ent.playedShockSound) {
+			if (player.distanceTo(ent) < MiArmory.speedOfSound(ent.simAge) && !ent.playedShockSound) {
 				ent.level().playLocalSound(ent.getOnPos(), MiArmorySounds.NUCLEAR_EXPLOSION.get(), SoundSource.BLOCKS, 1f, 1f, false);
 				ent.playedShockSound = true;
 			}

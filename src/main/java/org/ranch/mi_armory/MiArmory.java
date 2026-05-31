@@ -76,17 +76,14 @@ public class MiArmory {
 	}
 
 	public static void decimate(BlockPos pos, int strength, boolean visuals, Entity cause, Level level) {
-		NukeExplosionType type = EntityNukeExplosion.getExplosionType(level, pos);
 		if (!level.isClientSide() && level instanceof ServerLevel sLevel) {
 			EntityNukeExplosion explosion = EntityNukeExplosion.create(pos.getBottomCenter(), level, strength, cause);
-			explosion.type = type;
 			level.addFreshEntity(explosion);
 			explosion.loadChunk();
 		}
 
 		if (visuals) {
 			EntityNukeEffects effects = EntityNukeEffects.create(pos.getBottomCenter(), level, strength);
-			effects.type = type;
 			level.addFreshEntity(effects);
 		}
 	}

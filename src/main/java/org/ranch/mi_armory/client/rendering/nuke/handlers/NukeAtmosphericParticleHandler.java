@@ -6,6 +6,6 @@ import org.ranch.mi_armory.client.rendering.nuke.EntityNukeEffects;
 public class NukeAtmosphericParticleHandler extends AbstractNukeAtmosphericParticleHandler {
 	@Override
 	protected double getStandardSpawnHeight(EntityNukeEffects ent) {
-		return getCoreHeight(ent.age);
+		return getCoreHeight(ent.simAge);
 	}
 }
