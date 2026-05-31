@@ -17,17 +17,18 @@ import org.ranch.mi_armory.MiArmoryConstants;
 import org.ranch.mi_armory.MiArmoryEntities;
 import org.ranch.mi_armory.client.rendering.Cloudlet;
 import org.ranch.mi_armory.client.rendering.nuke.handlers.NukeParticleHandler;
+import org.ranch.mi_armory.explosions.EntityChunkloading;
 import org.ranch.mi_armory.explosions.EntityNukeExplosion;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class EntityNukeEffects extends Entity {
+public class EntityNukeEffects extends EntityChunkloading {
 
 	private static final EntityDataAccessor<Long> AGE = SynchedEntityData.defineId(EntityNukeEffects.class, EntityDataSerializers.LONG);
 
-	private final int MAX_CATCHUP = 400;
+	private final int MAX_CATCHUP = 15;
 
 	public NukeExplosionType type;
 	public int simAge;
@@ -53,16 +54,17 @@ public class EntityNukeEffects extends Entity {
 	@Override
 	public void tick() {
 
-		if (entityData.get(AGE) > 20) playedEMISound = true;
 		if (entityData.get(AGE) > 200) playedShockSound = true;
 
 		if (type == null) {
 			type = EntityNukeExplosion.getExplosionType(level(), BlockPos.containing(position()));
 		}
 
+		loadChunk();
+
 		super.tick();
 
-		for (int i = 0; i < MAX_CATCHUP && entityData.get(AGE) > simAge; i++) {
+		for (int i = 0; i < MAX_CATCHUP && !upToDate(); i++) {
 			tickSimulation();
 		}
 
@@ -71,6 +73,10 @@ public class EntityNukeEffects extends Entity {
 		}
 
 		entityData.set(AGE, entityData.get(AGE) + 1);
+	}
+
+	public boolean upToDate() {
+		return simAge >= entityData.get(AGE);
 	}
 
 	private void tickSimulation() {
