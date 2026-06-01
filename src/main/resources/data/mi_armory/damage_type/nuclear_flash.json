@@ -1,0 +1,7 @@
+{
+  "message_id": "nuclear_flash",
+  "scaling": "never",
+  "exhaustion": 0.1,
+  "effects": "burning",
+  "death_message_type": "default"
+}

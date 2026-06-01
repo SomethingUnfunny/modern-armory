@@ -46,7 +46,7 @@ public class EntityNukeEffectsRenderer extends EntityRenderer<EntityNukeEffects>
 
 	public void render(EntityNukeEffects ent, float p_114600_, float p_114601_, PoseStack poseStack, MultiBufferSource bufferSource, int light) {
 
-		if (!ent.upToDate()) return;
+		if (Math.abs(ent.getAge() - ent.simAge) > 20) return;
 
 		VertexConsumer cloudletVertexConsumer = bufferSource.getBuffer(CLOUDLET_RENDER_TYPE);
 

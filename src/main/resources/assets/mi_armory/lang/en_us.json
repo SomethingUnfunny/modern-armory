@@ -2,6 +2,8 @@
   "itemGroup.mi_armory": "MI Armory",
   "item.mi_armory.detonator": "Detonator",
   "item.mi_armory.multi_detonator": "Multi Detonator",
+  "death.attack.nuclear_shockwave": "%1$s was torn apart by a nuclear blast.",
+  "death.attack.nuclear_flash": "%1$s was instantly vaporized.",
   "detonator.tooltip": "Linked with nuke at:",
   "multi_detonator.tooltip": "Linked with nukes at:",
   "detonator.message": "Linked Nuke"

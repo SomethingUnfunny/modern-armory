@@ -1,0 +1,7 @@
+{
+  "message_id": "nuclear_shockwave",
+  "scaling": "never",
+  "exhaustion": 0.4,
+  "effects": "hurt",
+  "death_message_type": "default"
+}

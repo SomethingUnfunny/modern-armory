@@ -48,8 +48,6 @@ public class RaycastExplosion {
 			iterator = new GSPIterator(calculatePointDensity(range));
 		}
 
-		System.out.println("casting " + amount + " rays");
-
 		for (int i = 0; i < amount; i++) {
 			if (!iterator.hasNext()) {
 				castingComplete = true;

@@ -64,7 +64,7 @@ public class EntityNukeEffects extends EntityChunkloading {
 
 		super.tick();
 
-		for (int i = 0; i < MAX_CATCHUP && !upToDate(); i++) {
+		for (int i = 0; i < MAX_CATCHUP && entityData.get(AGE) > simAge; i++) {
 			tickSimulation();
 		}
 
@@ -75,8 +75,8 @@ public class EntityNukeEffects extends EntityChunkloading {
 		entityData.set(AGE, entityData.get(AGE) + 1);
 	}
 
-	public boolean upToDate() {
-		return simAge >= entityData.get(AGE);
+	public long getAge() {
+		return entityData.get(AGE);
 	}
 
 	private void tickSimulation() {

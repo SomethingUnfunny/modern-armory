@@ -125,12 +125,12 @@ public abstract class AbstractNukeAtmosphericParticleHandler implements NukePart
 				float motMult = age > 15 ? 0.75f : 0.0f;
 
 				TorusCloudlet c = (TorusCloudlet) new TorusCloudlet.TorusCloudletBuilder(
-						new Vector3d(sx, sy + 2, sz), new Vector3d())
+						new Vector3d(sx, sy + 1, sz), new Vector3d())
 						.angle(rot)
 						.rangeMod(1)
 						.id(SHOCK)
 						.maxLife(shockLife)
-						.scale(7.0f, 7.0f + 2.0f)
+						.scale(4.0f, 4.0f + 2.0f)
 						.motionMultiplier(motMult)
 						.build();
 				cloudlets.add(c);

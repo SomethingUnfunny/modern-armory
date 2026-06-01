@@ -15,6 +15,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import org.ranch.mi_armory.MiArmory;
 import org.ranch.mi_armory.MiArmoryComponents;
 
@@ -35,8 +36,8 @@ public class DetonatorItem extends Item {
 		} else {
 			BlockPos selected = stack.get(MiArmoryComponents.DETONATOR_SELECTION).getBlockPos();
 			if (level.getBlockState(selected).getBlock() == MIBlock.NUKE.get()) {
-				level.setBlock(selected, Blocks.AIR.defaultBlockState(), 11);
-				MiArmory.decimate(selected, 140, true, player, level);
+				level.setBlock(selected, Blocks.AIR.defaultBlockState(), 3);
+				createExplosion(level.getBlockState(selected), selected, player, level);
 				stack.remove(MiArmoryComponents.DETONATOR_SELECTION);
 			}
 
@@ -81,5 +82,9 @@ public class DetonatorItem extends Item {
 			tooltip.add(Component.translatable("detonator.tooltip").withColor(ChatFormatting.GRAY.getColor()));
 			tooltip.add(getSelection(stack.get(MiArmoryComponents.DETONATOR_SELECTION)));
 		}
+	}
+
+	public void createExplosion(BlockState nuke, BlockPos location, Player cause, Level level) {
+		MiArmory.decimate(location, 140, true, cause, level);
 	}
 }
