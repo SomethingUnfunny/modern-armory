@@ -1,5 +1,8 @@
 package org.ranch.mi_armory.explosions;
 
+import aztech.modern_industrialization.machines.helper.SteamHelper;
+import aztech.modern_industrialization.materials.property.MaterialHardness;
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -7,18 +10,18 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3i;
-import org.ranch.mi_armory.MiArmory;
-import org.ranch.mi_armory.MiArmoryConstants;
-import org.ranch.mi_armory.MiArmoryDamageTypes;
-import org.ranch.mi_armory.MiArmoryEntities;
+import org.lwjgl.system.MathUtil;
+import org.ranch.mi_armory.*;
 import org.ranch.mi_armory.client.rendering.nuke.NukeExplosionType;
 import org.ranch.mi_armory.network.PacketDetonation;
 
@@ -91,17 +94,23 @@ public class EntityNukeExplosion extends EntityChunkloading {
 			double dist = entity.position().distanceTo(position());
 			if (dist > radius) continue;
 
-			double damage = getDamage(dist, radius, strength * 2);
+			double damage = getDamage(dist, radius, strength * 8);
 
 			if ((type == NukeExplosionType.ATMOSPHERIC || type == NukeExplosionType.ATMOSPHERIC_STEM) && !processedFlash.contains(entity.getId())) {
+				float exposure = Explosion.getSeenPercent(new Vec3(x, y + 0.5, z), entity);
 				DamageSource flashSource = world.damageSources().source(MiArmoryDamageTypes.NUCLEAR_FLASH, cause);
-				entity.hurt(flashSource, (float) (damage / 2));
+				entity.hurt(flashSource, (float) (damage * exposure));
 				processedFlash.add(entity.getId());
 			}
 
 			if (dist < MiArmory.speedOfSound(tickCount) && !processedShock.contains(entity.getId())) {
 				DamageSource blastSource = world.damageSources().source(MiArmoryDamageTypes.NUCLEAR_SHOCKWAVE, cause);
-				entity.hurt(blastSource, (float)damage);
+				double resDamage = damage;
+				if (entity instanceof LivingEntity l && l.getAttribute(MiArmoryAttributes.SHOCKWAVE_RESISTANCE) != null) {
+					double resistance = l.getAttributeValue(MiArmoryAttributes.SHOCKWAVE_RESISTANCE);
+					resDamage *= 1 - resistance;
+				}
+				entity.hurt(blastSource, (float)resDamage);
 				Vec3 pushDir = entity.position().subtract(position()).normalize();
 				pushDir = pushDir.normalize().scale(3.0F);
 				pushDir = new Vec3(pushDir.x, 1.0F, pushDir.z);

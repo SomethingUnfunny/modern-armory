@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -17,6 +18,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.ranch.mi_armory.client.rendering.nuke.NukeExplosionType;
@@ -39,6 +41,8 @@ public class MiArmory {
 		MiArmoryItems.register(modEventBus);
 		MiArmoryComponents.register(modEventBus);
 		MiArmorySounds.register(modEventBus);
+		MiArmoryArmorMaterials.register(modEventBus);
+		MiArmoryAttributes.register(modEventBus);
 
 		// Register our mod's ModConfigSpec so that FML can create and load the config file for us
 		modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -64,6 +68,14 @@ public class MiArmory {
 
 			registrar.playToClient(PacketDetonation.TYPE, PacketDetonation.STREAM_CODEC, PacketDetonation::handle);
 		}
+
+		@SubscribeEvent
+		public static void modifyDefaultAttributes(EntityAttributeModificationEvent event) {
+			event.add(
+					EntityType.PLAYER,
+					MiArmoryAttributes.SHOCKWAVE_RESISTANCE
+			);
+		}
 	}
 
 	@EventBusSubscriber(modid = MODID, value = Dist.CLIENT)
@@ -77,13 +89,13 @@ public class MiArmory {
 
 	public static void decimate(BlockPos pos, int strength, boolean visuals, Entity cause, Level level) {
 		if (!level.isClientSide() && level instanceof ServerLevel sLevel) {
-			EntityNukeExplosion explosion = EntityNukeExplosion.create(pos.getBottomCenter(), level, strength, cause);
+			EntityNukeExplosion explosion = EntityNukeExplosion.create(pos.getCenter(), level, strength, cause);
 			level.addFreshEntity(explosion);
 			explosion.loadChunk();
 		}
 
 		if (visuals) {
-			EntityNukeEffects effects = EntityNukeEffects.create(pos.getBottomCenter(), level, strength);
+			EntityNukeEffects effects = EntityNukeEffects.create(pos.getCenter(), level, strength);
 			level.addFreshEntity(effects);
 		}
 	}
