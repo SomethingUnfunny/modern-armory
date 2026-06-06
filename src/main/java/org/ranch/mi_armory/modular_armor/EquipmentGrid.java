@@ -42,10 +42,32 @@ public record EquipmentGrid(int width, int height, List<Entry> modules) {
 		return null;
 	}
 
+	public boolean inBounds(int x, int y) {
+		return x >= 0 && y >= 0 && x < width() && y < height();
+	}
+
 	public EquipmentGrid remove(Entry entry) {
 		List<Entry> entries = new ArrayList<>(modules);
 		entries.remove(entry);
 		return new EquipmentGrid(width, height, entries);
+	}
+
+	public EquipmentGrid add(Entry entry) {
+		//if (!canAdd(entry)) return this;
+		List<Entry> entries = new ArrayList<>(modules);
+		entries.add(entry);
+		return new EquipmentGrid(width, height, entries);
+	}
+
+	public boolean canAdd(Entry entry) {
+		if (!inBounds(entry.x, entry.y)) return false;
+		if (entry.x + entry.width() > width() || entry.y + entry.height() > height()) return false;
+		for (Entry e : modules) {
+			if (e.touching(entry)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public record Entry(int x, int y, ItemStack stack) {
@@ -62,9 +84,22 @@ public record EquipmentGrid(int width, int height, List<Entry> modules) {
 			return ModuleList.getFromItem(stack.getItem());
 		}
 
+		public int width() {
+			return module().width();
+		}
+
+		public int height() {
+			return module().height();
+		}
+
 		public boolean touching(int x, int y) {
-			return x >= this.x && x <= this.x + module().width()
-					&& y >= this.y && y <= this.y + module().height();
+			return x >= this.x && x < this.x + module().width()
+					&& y >= this.y && y < this.y + module().height();
+		}
+
+		public boolean touching(Entry other) {
+			return x < other.x() + other.width() && x + width() > other.x()
+					&& y < other.y() + other.width() && y + width() > other.y();
 		}
 	}
 }

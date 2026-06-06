@@ -1,5 +1,6 @@
 package org.ranch.mi_armory.modular_armor;
 
+import aztech.modern_industrialization.MIItem;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -37,6 +38,20 @@ public class ModuleList {
 						List.of(
 								new Module.AddedAttribute(
 										Attributes.JUMP_STRENGTH,
+										0.1
+								)
+						)
+				)
+		);
+		addModule(
+				Items.IRON_INGOT,
+				new Module(
+						1,
+						2,
+						100,
+						List.of(
+								new Module.AddedAttribute(
+										Attributes.MOVEMENT_SPEED,
 										0.1
 								)
 						)

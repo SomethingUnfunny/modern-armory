@@ -27,9 +27,7 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 						.component(MIComponents.ENERGY, 0L)
 						.component(
 								MiArmoryComponents.EQUIPMENT_GRID_COMPONENT,
-								new EquipmentGrid(5, 5, List.of(
-										new EquipmentGrid.Entry(0,1, new ItemStack(Items.DIAMOND))
-								))
+								new EquipmentGrid(4, 4, new ArrayList<>())
 						)
 		);
 	}

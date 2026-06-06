@@ -27,6 +27,10 @@ repositories {
     }
 }
 
+neoForge {
+    accessTransformers.from 'src/main/resources/META-INF/accesstransformer.cfg'
+}
+
 base {
     archivesName = mod_id
 }

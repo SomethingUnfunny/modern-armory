@@ -16,40 +16,50 @@ import org.ranch.mi_armory.network.PacketEquipmentGridClick;
 
 public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridContainerMenu> {
 	public static final ResourceLocation EQUIPMENT_GRID_GUI = MiArmory.location("textures/gui/container/equipment_grid.png");
+	public static final ResourceLocation ENTRY_SPRITE = MiArmory.location("container/entry");
+	public static final ResourceLocation ENTRY_SLOT = MiArmory.location("textures/gui/container/entry_slot.png");
 
-	private int selectedModule = -1;
-
-	private final int TILE_SIZE = 16;
-	private final int GRID_X = this.leftPos + 60;
-	private final int GRID_Y = 20;
+	private final int TILE_SIZE = 18;
+	private int gridX;
+	private int gridY;
 
 	public EquipmentGridScreen(EquipmentGridContainerMenu menu, Inventory playerInventory, Component title) {
 		super(menu, playerInventory, title);
+		this.imageHeight = 175;
+	}
+
+	@Override
+	protected void init() {
+		super.init();
+		gridX = this.leftPos + 52;
+		gridY = this.topPos - 2;
 	}
 
 	@Override
 	protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-		guiGraphics.blit(EQUIPMENT_GRID_GUI, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+		guiGraphics.blit(EQUIPMENT_GRID_GUI, this.leftPos, this.topPos - 9, 0, 0, this.imageWidth, this.imageHeight);
 
-		int[] mpos = mouseToGridPos(mouseX, mouseY, GRID_X, GRID_Y, TILE_SIZE);
+		int[] mpos = mouseToGridPos(mouseX, mouseY, gridX, gridY, TILE_SIZE);
 
 		EquipmentGrid grid = menu.getEquipmentGrid();
 		if (grid != null) {
-			renderGrid(grid, guiGraphics, GRID_X, GRID_Y, TILE_SIZE);
+			renderGrid(grid, guiGraphics, gridX, gridY, TILE_SIZE);
 		}
-		guiGraphics.renderOutline(GRID_X + mpos[0] * TILE_SIZE, GRID_Y + mpos[1] * TILE_SIZE, TILE_SIZE, TILE_SIZE, 0xFFFF0000);
+		guiGraphics.renderOutline(gridX + mpos[0] * TILE_SIZE, gridY + mpos[1] * TILE_SIZE, TILE_SIZE, TILE_SIZE, 0xFFFF0000);
 
 	}
 
 	public void renderGrid(EquipmentGrid grid, GuiGraphics guiGraphics, int x, int y, int tileSize) {
+
 		for (int i = 0; i < grid.width(); i++) {
 			for (int j = 0; j < grid.height(); j++) {
-				guiGraphics.renderOutline(x + i * tileSize, y + j * tileSize, tileSize, tileSize, 0xFFFFFFFF);
+				guiGraphics.blit(ENTRY_SLOT, x + i * tileSize, y + j * tileSize, 0, 0, tileSize, tileSize, 18, 18);
 			}
 		}
 
 		for (EquipmentGrid.Entry entry : grid.modules()) {
-			guiGraphics.renderOutline(x + entry.x() * tileSize, y + entry.y() * tileSize, entry.module().width() * tileSize, entry.module().height() * tileSize, 0xFF0000FF);
+			guiGraphics.blitSprite(ENTRY_SPRITE, x + entry.x() * tileSize, y + entry.y() * tileSize, entry.width() * tileSize, entry.height() * tileSize);
+			guiGraphics.renderItem(entry.stack(), x + entry.x() * tileSize + entry.width() * tileSize / 2 - 8, y + entry.y() * tileSize + entry.height() * tileSize / 2 - 8);
 		}
 	}
 
@@ -63,20 +73,27 @@ public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridCo
 
 	@Override
 	public boolean mouseClicked(double x, double y, int p_97750_) {
-		boolean ret = super.mouseClicked(x, y, p_97750_);
-		int[] mpos = mouseToGridPos(x, y, GRID_X, GRID_Y, TILE_SIZE);
+		int[] mpos = mouseToGridPos(x, y, gridX, gridY, TILE_SIZE);
 		EquipmentGrid grid = menu.getEquipmentGrid();
-		if (grid != null) {
-			EquipmentGrid.Entry entry = grid.getAtPos(mpos[0], mpos[1]);
-			if (entry != null) {
-				menu.onGridClick(mpos[0], mpos[1], PacketEquipmentGridClick.ClickType.REMOVE);
-			}
+		if (grid != null && grid.inBounds(mpos[0], mpos[1])) {
+			menu.onGridClick(mpos[0], mpos[1], PacketEquipmentGridClick.ClickType.REMOVE);
 		}
-		return ret;
+		return super.mouseClicked(x, y, p_97750_);
+	}
+
+	@Override
+	public boolean mouseReleased(double x, double y, int p_97814_) {
+		int[] mpos = mouseToGridPos(x, y, gridX, gridY, TILE_SIZE);
+		EquipmentGrid grid = menu.getEquipmentGrid();
+		if (grid != null && grid.inBounds(mpos[0], mpos[1])) {
+			return true;
+		}
+		return super.mouseReleased(x, y, p_97814_);
 	}
 
 	@Override
 	public void render(GuiGraphics p_283479_, int p_283661_, int p_281248_, float p_281886_) {
 		super.render(p_283479_, p_283661_, p_281248_, p_281886_);
+		this.renderTooltip(p_283479_, p_283661_, p_281248_);
 	}
 }
