@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
 import org.ranch.mi_armory.MiArmory;
 import org.ranch.mi_armory.MiArmoryBlocks;
+import org.ranch.mi_armory.network.PacketEquipmentGridClick;
 
 public class EquipmentGridContainerMenu extends AbstractContainerMenu {
 
@@ -28,6 +29,15 @@ public class EquipmentGridContainerMenu extends AbstractContainerMenu {
 		super(MiArmory.EQUIPMENT_GRID_MENU.get(), containerId);
 		this.access = access;
 
+		armor = new Slot(new SimpleContainer(1) {
+			@Override
+			public void setChanged() {
+				super.setChanged();
+				slotsChanged(this);
+			}
+		}, 0, 34, 33);
+
+		this.addSlot(armor);
 
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 9; j++) {
@@ -42,16 +52,30 @@ public class EquipmentGridContainerMenu extends AbstractContainerMenu {
 		for (int i = 0; i < 4; i++) {
 			this.addSlot(new Slot(playerInventory, i + 36, 8, 60 - i * 18));
 		}
+	}
 
-		armor = new Slot(new SimpleContainer(1) {
-			@Override
-			public void setChanged() {
-				super.setChanged();
-				slotsChanged(this);
+	public EquipmentGrid getEquipmentGrid() {
+		return EquipmentGrid.getGridData(armor.getItem());
+	}
+
+	public void setEquipmentGrid(EquipmentGrid grid) {
+		EquipmentGrid.setGridData(armor.getItem(), grid);
+	}
+
+	public void onGridClick(int x, int y, PacketEquipmentGridClick.ClickType clickType) {
+		PacketEquipmentGridClick.sendToServer(x, y, clickType, containerId);
+		//handleGridClick(x, y, clickType); // idunnoooooo
+	}
+
+	public void handleGridClick(int x, int y, PacketEquipmentGridClick.ClickType clickType) {
+		EquipmentGrid grid = getEquipmentGrid();
+		if (grid != null) {
+			EquipmentGrid.Entry entry = grid.getAtPos(x, y);
+			if (entry != null) {
+				setEquipmentGrid(grid.remove(entry));
+				this.setCarried(entry.stack());
 			}
-		}, 0, 34, 33);
-
-		this.addSlot(armor);
+		}
 	}
 
 	@Override

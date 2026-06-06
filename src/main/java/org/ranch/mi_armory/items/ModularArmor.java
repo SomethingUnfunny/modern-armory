@@ -3,23 +3,35 @@ package org.ranch.mi_armory.items;
 import aztech.modern_industrialization.MIComponents;
 import dev.technici4n.grandpower.api.ISimpleEnergyItem;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.world.item.*;
 import org.ranch.mi_armory.MiArmoryArmorMaterials;
+import org.ranch.mi_armory.MiArmoryComponents;
+import org.ranch.mi_armory.modular_armor.EquipmentGrid;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 	public static final long ENERGY_CAPACITY = 1 << 16;
 
 	public ModularArmor(Type type) {
-		super(MiArmoryArmorMaterials.MODULAR, type, new Item.Properties().durability(type.getDurability(50)).component(MIComponents.ENERGY, 0L));
+		super(MiArmoryArmorMaterials.MODULAR, type,
+				new Item.Properties()
+						.durability(type.getDurability(50))
+						.component(MIComponents.ENERGY, 0L)
+						.component(
+								MiArmoryComponents.EQUIPMENT_GRID_COMPONENT,
+								new EquipmentGrid(5, 5, List.of(
+										new EquipmentGrid.Entry(0,1, new ItemStack(Items.DIAMOND))
+								))
+						)
+		);
 	}
 
 	@Override

@@ -37,6 +37,7 @@ import org.ranch.mi_armory.modular_armor.EquipmentGridContainerMenu;
 import org.ranch.mi_armory.network.PacketDetonation;
 import org.ranch.mi_armory.client.rendering.nuke.EntityNukeEffects;
 import org.ranch.mi_armory.client.rendering.nuke.EntityNukeEffectsRenderer;
+import org.ranch.mi_armory.network.PacketEquipmentGridClick;
 import org.slf4j.Logger;
 
 import java.util.function.Supplier;
@@ -89,6 +90,7 @@ public class MiArmory {
 			final PayloadRegistrar registrar = event.registrar(MODID).versioned("1");
 
 			registrar.playToClient(PacketDetonation.TYPE, PacketDetonation.STREAM_CODEC, PacketDetonation::handle);
+			registrar.playToServer(PacketEquipmentGridClick.TYPE, PacketEquipmentGridClick.STREAM_CODEC, PacketEquipmentGridClick::handle);
 		}
 
 		@SubscribeEvent

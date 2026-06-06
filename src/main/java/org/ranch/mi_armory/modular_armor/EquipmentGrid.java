@@ -1,30 +1,70 @@
 package org.ranch.mi_armory.modular_armor;
 
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.ai.attributes.Attribute;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
+import org.ranch.mi_armory.MiArmory;
+import org.ranch.mi_armory.MiArmoryComponents;
+import org.ranch.mi_armory.MiArmoryDamageTypes;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class EquipmentGrid {
+public record EquipmentGrid(int width, int height, List<Entry> modules) {
 
-	public final int width;
-	public final int height;
+	public static final Codec<EquipmentGrid> CODEC = RecordCodecBuilder.create(
+			(instance) -> instance.group(
+							Codec.INT.fieldOf("width").forGetter(EquipmentGrid::width),
+							Codec.INT.fieldOf("height").forGetter(EquipmentGrid::height),
+							Entry.CODEC.listOf().fieldOf("modules").forGetter(EquipmentGrid::modules))
+					.apply(instance, EquipmentGrid::new)
+	);
 
-	public final ArrayList<Entry> modules;
-
-	public EquipmentGrid(int width, int height) {
-		this.width = width;
-		this.height = height;
-		this.modules = new ArrayList<>();
+	public static boolean hasGridData(ItemStack itemStack) {
+		return itemStack.get(MiArmoryComponents.EQUIPMENT_GRID_COMPONENT) != null;
 	}
 
-	public record Entry(int x, int y, ItemStack stack, Module module) {
+	public static EquipmentGrid getGridData(ItemStack itemStack) {
+		return itemStack.get(MiArmoryComponents.EQUIPMENT_GRID_COMPONENT);
+	}
 
+	public static void setGridData(ItemStack itemStack, EquipmentGrid grid) {
+		itemStack.set(MiArmoryComponents.EQUIPMENT_GRID_COMPONENT, grid);
+	}
+
+
+	public Entry getAtPos(int x, int y) {
+		for (Entry entry : modules) {
+			if (entry.touching(x, y)) {
+				return entry;
+			}
+		}
+		return null;
+	}
+
+	public EquipmentGrid remove(Entry entry) {
+		List<Entry> entries = new ArrayList<>(modules);
+		entries.remove(entry);
+		return new EquipmentGrid(width, height, entries);
+	}
+
+	public record Entry(int x, int y, ItemStack stack) {
+
+		public static final Codec<Entry> CODEC = RecordCodecBuilder.create(
+				(instance) -> instance.group(
+								Codec.INT.fieldOf("x").forGetter(Entry::x),
+								Codec.INT.fieldOf("y").forGetter(Entry::y),
+								ItemStack.CODEC.fieldOf("stack").forGetter(Entry::stack))
+						.apply(instance, Entry::new)
+		);
+
+		public Module module() {
+			return ModuleList.getFromItem(stack.getItem());
+		}
+
+		public boolean touching(int x, int y) {
+			return x >= this.x && x <= this.x + module().width()
+					&& y >= this.y && y <= this.y + module().height();
+		}
 	}
 }
