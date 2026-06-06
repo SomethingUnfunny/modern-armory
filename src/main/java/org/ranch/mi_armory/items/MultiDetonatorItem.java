@@ -60,7 +60,7 @@ public class MultiDetonatorItem extends DetonatorItem {
 
 	public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
 		if (stack.get(MiArmoryComponents.DETONATOR_SELECTIONS) != null) {
-			tooltip.add(Component.translatable("multi_detonator.tooltip").withColor(ChatFormatting.GRAY.getColor()));
+			tooltip.add(Component.translatable("mi_armory.multi_detonator.tooltip").withColor(ChatFormatting.GRAY.getColor()));
 			for (DetonatorSelection selection : stack.get(MiArmoryComponents.DETONATOR_SELECTIONS).positions()) {
 				tooltip.add(getSelection(selection));
 			}

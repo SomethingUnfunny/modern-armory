@@ -1,13 +1,18 @@
 package org.ranch.mi_armory;
 
+import aztech.modern_industrialization.MI;
+import aztech.modern_industrialization.blocks.forgehammer.ForgeHammerScreenHandler;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -18,24 +23,39 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
-import org.ranch.mi_armory.client.rendering.nuke.NukeExplosionType;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import org.ranch.mi_armory.client.gui.EquipmentGridScreen;
 import org.ranch.mi_armory.explosions.EntityNukeExplosion;
+import org.ranch.mi_armory.modular_armor.EquipmentGridContainerMenu;
 import org.ranch.mi_armory.network.PacketDetonation;
 import org.ranch.mi_armory.client.rendering.nuke.EntityNukeEffects;
 import org.ranch.mi_armory.client.rendering.nuke.EntityNukeEffectsRenderer;
 import org.slf4j.Logger;
 
+import java.util.function.Supplier;
+
 @Mod(MiArmory.MODID)
 public class MiArmory {
 	public static final String MODID = "mi_armory";
-	private static final Logger LOGGER = LogUtils.getLogger();
+	public static final Logger LOGGER = LogUtils.getLogger();
+
+	public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, MiArmory.MODID);
+
+	public static final Supplier<MenuType<EquipmentGridContainerMenu>> EQUIPMENT_GRID_MENU = MENUS.register("equipment_grid", () -> {
+		return new MenuType<>(EquipmentGridContainerMenu::new, FeatureFlags.VANILLA_SET);
+	});
 
 	public MiArmory(IEventBus modEventBus, ModContainer modContainer) {
 		// Register the commonSetup method for modloading
 		modEventBus.addListener(this::commonSetup);
+		modEventBus.addListener(MiArmoryItems::onRegisterCapabilities);
 
 		MiArmoryEntities.register(modEventBus);
 		MiArmoryItems.register(modEventBus);
@@ -43,6 +63,8 @@ public class MiArmory {
 		MiArmorySounds.register(modEventBus);
 		MiArmoryArmorMaterials.register(modEventBus);
 		MiArmoryAttributes.register(modEventBus);
+		MiArmoryBlocks.register(modEventBus);
+		MENUS.register(modEventBus);
 
 		// Register our mod's ModConfigSpec so that FML can create and load the config file for us
 		modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -84,6 +106,11 @@ public class MiArmory {
 		public static void onClientSetup(FMLClientSetupEvent event) {
 			EntityRenderers.register(MiArmoryEntities.NUKE.get(), NoopRenderer::new);
 			EntityRenderers.register(MiArmoryEntities.TOREX.get(), EntityNukeEffectsRenderer::new);
+		}
+
+		@SubscribeEvent
+		public static void registerScreens(RegisterMenuScreensEvent event) {
+			event.register(EQUIPMENT_GRID_MENU.get(), EquipmentGridScreen::new);
 		}
 	}
 

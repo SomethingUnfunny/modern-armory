@@ -1,0 +1,9 @@
+{
+  "item": "minecraft:diamond_sword",
+  "width": 1,
+  "height": 2,
+  "active_drain": 100,
+  "attributes": {
+    "mi_armory:shockwave_resistance": 0.1
+  }
+}

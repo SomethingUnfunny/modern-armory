@@ -38,6 +38,27 @@ public class MiArmoryArmorMaterials {
                     0.20f
             ));
 
+	public static final Holder<ArmorMaterial> MODULAR =
+			ARMOR_MATERIALS.register("modular_armor", () -> new ArmorMaterial(
+					Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+						map.put(ArmorItem.Type.BOOTS, 3);
+						map.put(ArmorItem.Type.LEGGINGS, 6);
+						map.put(ArmorItem.Type.CHESTPLATE, 8);
+						map.put(ArmorItem.Type.HELMET, 3);
+						map.put(ArmorItem.Type.BODY, 11);
+					}),
+					0,
+					SoundEvents.ARMOR_EQUIP_GENERIC,
+					() -> Ingredient.of(),
+					List.of(
+							new ArmorMaterial.Layer(
+									MiArmory.location("modular")
+							)
+					),
+					5,
+					0.20f
+			));
+
     public static void register(IEventBus modEventBus) {
         ARMOR_MATERIALS.register(modEventBus);
     }

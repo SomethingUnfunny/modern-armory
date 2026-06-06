@@ -4,6 +4,7 @@
   "package": "org.ranch.mi_armory.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "ItemStackMixin",
     "TrackedEntityMixin"
   ],
   "client": [

@@ -9,7 +9,8 @@
   "attributes.mi_armory.shockwave_resistance": "Nuclear Blast Resistance",
   "death.attack.nuclear_shockwave": "%1$s was torn apart by a nuclear blast.",
   "death.attack.nuclear_flash": "%1$s was instantly vaporized.",
-  "detonator.tooltip": "Linked with nuke at:",
-  "multi_detonator.tooltip": "Linked with nukes at:",
-  "detonator.message": "Linked Nuke"
+  "mi_armory.detonator.tooltip": "Linked with nuke at:",
+  "mi_armory.multi_detonator.tooltip": "Linked with nukes at:",
+  "mi_armory.detonator.message": "Linked Nuke",
+  "mi_armory.has_module": "Can be installed into modular Armor."
 }

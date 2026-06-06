@@ -53,7 +53,7 @@ public class DetonatorItem extends Item {
 		Block block = world.getBlockState(pos).getBlock();
 		if (!world.isClientSide && block == MIBlock.NUKE.get() && player.isShiftKeyDown()) {
 			selectNuke(pos, stack);
-			player.displayClientMessage(Component.translatable("detonator.message"), true);
+			player.displayClientMessage(Component.translatable("mi_armory.detonator.message"), true);
 			return InteractionResult.SUCCESS;
 		}
 
@@ -79,7 +79,7 @@ public class DetonatorItem extends Item {
 
 	public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
 		if (stack.get(MiArmoryComponents.DETONATOR_SELECTION) != null) {
-			tooltip.add(Component.translatable("detonator.tooltip").withColor(ChatFormatting.GRAY.getColor()));
+			tooltip.add(Component.translatable("mi_armory.detonator.tooltip").withColor(ChatFormatting.GRAY.getColor()));
 			tooltip.add(getSelection(stack.get(MiArmoryComponents.DETONATOR_SELECTION)));
 		}
 	}
