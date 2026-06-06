@@ -15,7 +15,7 @@ import org.ranch.mi_armory.client.MiArmoryClient;
 import org.ranch.mi_armory.client.rendering.nuke.NukeExplosionType;
 import org.ranch.mi_armory.modular_armor.EquipmentGridContainerMenu;
 
-public record PacketEquipmentGridClick(int x, int y, ClickType clickType, int syncId) implements CustomPacketPayload {
+public record PacketEquipmentGridClick(int x, int y, int syncId) implements CustomPacketPayload {
 	public static final Type<PacketEquipmentGridClick> TYPE = new Type<>(MiArmory.location("equipment_grid_click"));
 
 	public static final StreamCodec<FriendlyByteBuf, PacketEquipmentGridClick> STREAM_CODEC = StreamCodec.composite(
@@ -23,8 +23,6 @@ public record PacketEquipmentGridClick(int x, int y, ClickType clickType, int sy
 			PacketEquipmentGridClick::x,
 			ByteBufCodecs.VAR_INT,
 			PacketEquipmentGridClick::y,
-			NeoForgeStreamCodecs.enumCodec(ClickType.class),
-			PacketEquipmentGridClick::clickType,
 			ByteBufCodecs.VAR_INT,
 			PacketEquipmentGridClick::syncId,
 			PacketEquipmentGridClick::new
@@ -35,16 +33,15 @@ public record PacketEquipmentGridClick(int x, int y, ClickType clickType, int sy
 		return TYPE;
 	}
 
-	public static void sendToServer(int x, int y, ClickType clickType, int syncId) {
-		PacketDistributor.sendToServer(new PacketEquipmentGridClick(x, y, clickType, syncId));
+	public static void sendToServer(int x, int y, int syncId) {
+		PacketDistributor.sendToServer(new PacketEquipmentGridClick(x, y, syncId));
 	}
 
 	public static void handle(PacketEquipmentGridClick payload, IPayloadContext ctx) {
 		AbstractContainerMenu menu = ctx.player().containerMenu;
 		if (menu instanceof EquipmentGridContainerMenu gridMenu) {
-			gridMenu.handleGridClick(payload.x, payload.y, payload.clickType);
+			gridMenu.handleGridClick(payload.x, payload.y, payload.syncId);
 		}
-		// todo maybe a low rumble depending on distance
 	}
 
 	public enum ClickType {

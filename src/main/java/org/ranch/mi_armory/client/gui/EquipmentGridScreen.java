@@ -39,14 +39,10 @@ public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridCo
 	protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
 		guiGraphics.blit(EQUIPMENT_GRID_GUI, this.leftPos, this.topPos - 9, 0, 0, this.imageWidth, this.imageHeight);
 
-		int[] mpos = mouseToGridPos(mouseX, mouseY, gridX, gridY, TILE_SIZE);
-
 		EquipmentGrid grid = menu.getEquipmentGrid();
 		if (grid != null) {
 			renderGrid(grid, guiGraphics, gridX, gridY, TILE_SIZE);
 		}
-		guiGraphics.renderOutline(gridX + mpos[0] * TILE_SIZE, gridY + mpos[1] * TILE_SIZE, TILE_SIZE, TILE_SIZE, 0xFFFF0000);
-
 	}
 
 	public void renderGrid(EquipmentGrid grid, GuiGraphics guiGraphics, int x, int y, int tileSize) {
@@ -76,7 +72,7 @@ public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridCo
 		int[] mpos = mouseToGridPos(x, y, gridX, gridY, TILE_SIZE);
 		EquipmentGrid grid = menu.getEquipmentGrid();
 		if (grid != null && grid.inBounds(mpos[0], mpos[1])) {
-			menu.onGridClick(mpos[0], mpos[1], PacketEquipmentGridClick.ClickType.REMOVE);
+			menu.onGridClick(mpos[0], mpos[1]);
 		}
 		return super.mouseClicked(x, y, p_97750_);
 	}

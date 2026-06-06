@@ -81,13 +81,16 @@ public class EquipmentGridContainerMenu extends AbstractContainerMenu {
 		EquipmentGrid.setGridData(armor.getItem(), grid);
 	}
 
-	public void onGridClick(int x, int y, PacketEquipmentGridClick.ClickType clickType) {
-		PacketEquipmentGridClick.sendToServer(x, y, clickType, containerId);
+	public void onGridClick(int x, int y) {
+		PacketEquipmentGridClick.sendToServer(x, y, containerId);
 		//handleGridClick(x, y, clickType); // idunnoooooo
 	}
 
-	public void handleGridClick(int x, int y, PacketEquipmentGridClick.ClickType clickType) {
+	public void handleGridClick(int x, int y, int syncId) {
+		if (this.containerId != syncId) return;
+
 		EquipmentGrid grid = getEquipmentGrid();
+
 		if (grid != null) {
 			EquipmentGrid.Entry entry = grid.getAtPos(x, y);
 			if (entry != null) { // remove from grid
