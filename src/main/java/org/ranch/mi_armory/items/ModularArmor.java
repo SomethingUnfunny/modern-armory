@@ -7,7 +7,14 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.level.Level;
 import org.ranch.mi_armory.MiArmoryArmorMaterials;
 import org.ranch.mi_armory.MiArmoryComponents;
 import org.ranch.mi_armory.modular_armor.EquipmentGrid;
@@ -18,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
-	public static final long ENERGY_CAPACITY = 1 << 16;
+	public static final long BASE_ENERGY_CAPACITY = 0;
 
 	public ModularArmor(Type type) {
 		super(MiArmoryArmorMaterials.MODULAR, type,
@@ -33,6 +40,67 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 	}
 
 	@Override
+	public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
+		ItemAttributeModifiers.Builder attributesBuilder = ItemAttributeModifiers.builder();
+
+		addVanillaAttributes(attributesBuilder);
+
+		EquipmentGrid grid = EquipmentGrid.getGridData(stack);
+		if (grid != null) {
+			for (EquipmentGrid.Entry entry : grid.modules()) {
+				entry.module().addAttributes(attributesBuilder, stack, type);
+			}
+		}
+
+		return attributesBuilder.build();
+	}
+
+	private ItemAttributeModifiers.Builder addVanillaAttributes(ItemAttributeModifiers.Builder attributesBuilder) {
+		EquipmentSlotGroup equipmentslotgroup = EquipmentSlotGroup.bySlot(type.getSlot());
+
+		ResourceLocation vanillaEffectLocation = ResourceLocation.withDefaultNamespace("armor." + type.getName());
+		attributesBuilder.add(
+				Attributes.ARMOR,
+				new AttributeModifier(
+						vanillaEffectLocation,
+						material.value().getDefense(type),
+						AttributeModifier.Operation.ADD_VALUE
+				),
+				equipmentslotgroup
+		);
+		attributesBuilder.add(
+				Attributes.ARMOR_TOUGHNESS,
+				new AttributeModifier(
+						vanillaEffectLocation,
+						material.value().toughness(),
+						AttributeModifier.Operation.ADD_VALUE
+				),
+				equipmentslotgroup
+		);
+
+		float f1 = material.value().knockbackResistance();
+		if (f1 > 0.0F) {
+			attributesBuilder.add(
+					Attributes.KNOCKBACK_RESISTANCE,
+					new AttributeModifier(
+							vanillaEffectLocation,
+							f1,
+							AttributeModifier.Operation.ADD_VALUE
+					),
+					equipmentslotgroup
+			);
+		}
+
+		return attributesBuilder;
+	}
+
+	@Override
+	public void inventoryTick(ItemStack stack, Level level, Entity entity, int p_41407_, boolean p_41408_) {
+		super.inventoryTick(stack, level, entity, p_41407_, p_41408_);
+		this.setStoredEnergy(stack, Math.min(getEnergyCapacity(stack), getStoredEnergy(stack)));
+	}
+
+	@Override
 	public boolean isDamageable(ItemStack stack) {
 		return false;
 	}
@@ -44,12 +112,20 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 
 	@Override
 	public long getEnergyCapacity(ItemStack stack) {
-		return ENERGY_CAPACITY;
+		long added = 0;
+
+		EquipmentGrid grid = EquipmentGrid.getGridData(stack);
+		if (grid != null) {
+			for (EquipmentGrid.Entry entry : grid.modules()) {
+				added += entry.module().addedEU();
+			}
+		}
+		return BASE_ENERGY_CAPACITY + added;
 	}
 
 	@Override
 	public long getEnergyMaxInput(ItemStack stack) {
-		return ENERGY_CAPACITY;
+		return getEnergyCapacity(stack);
 	}
 
 	@Override
@@ -64,7 +140,7 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 
 	@Override
 	public int getBarWidth(ItemStack stack) {
-		return (int) Math.round(getStoredEnergy(stack) / (double) ENERGY_CAPACITY * 13);
+		return (int) Math.round(getStoredEnergy(stack) / (double) getEnergyCapacity(stack) * 13);
 	}
 
 	@Override

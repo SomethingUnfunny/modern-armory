@@ -24,6 +24,15 @@ public class MiArmoryAttributes {
 			1
 	).setSentiment(Attribute.Sentiment.POSITIVE));
 
+	// modular armor attributes!!!!!!!!
+
+	public static final Holder<Attribute> ADDED_ENERGY_CAPACITY = ATTRIBUTES.register("added_energy_capacity", () -> new RangedAttribute(
+			"attributes.mi_armory.added_energy_capacity",
+			0,
+			0,
+			1
+	).setSentiment(Attribute.Sentiment.POSITIVE));
+
 	public static void register(IEventBus modEventBus) {
 		ATTRIBUTES.register(modEventBus);
 	}

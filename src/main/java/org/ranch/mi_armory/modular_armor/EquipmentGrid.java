@@ -85,16 +85,16 @@ public record EquipmentGrid(int width, int height, List<Entry> modules) {
 		}
 
 		public int width() {
-			return module().width();
+			return module().width;
 		}
 
 		public int height() {
-			return module().height();
+			return module().height;
 		}
 
 		public boolean touching(int x, int y) {
-			return x >= this.x && x < this.x + module().width()
-					&& y >= this.y && y < this.y + module().height();
+			return x >= this.x && x < this.x + module().width
+					&& y >= this.y && y < this.y + module().height;
 		}
 
 		public boolean touching(Entry other) {
