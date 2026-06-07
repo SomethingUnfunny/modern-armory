@@ -5,6 +5,7 @@ import aztech.modern_industrialization.MIText;
 import aztech.modern_industrialization.MITooltips;
 import dev.technici4n.grandpower.api.ISimpleEnergyItem;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -29,17 +30,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
-	public static final long BASE_ENERGY_CAPACITY = 2 << 15;
+	public static final long BASE_ENERGY_CAPACITY = 2 << 14;
 	public static final EquipmentSlot[] EQUIPMENT_SLOTS = new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
 
-	public ModularArmor(Type type) {
-		super(MiArmoryArmorMaterials.MODULAR, type,
+	public ModularArmor(Type type, Holder<ArmorMaterial> material, int grid_size) {
+		super(material, type,
 				new Item.Properties()
-						.durability(type.getDurability(50))
 						.component(MIComponents.ENERGY, 0L)
 						.component(
 								MiArmoryComponents.EQUIPMENT_GRID_COMPONENT,
-								new EquipmentGrid(4, 4, new ArrayList<>())
+								new EquipmentGrid(grid_size, grid_size, new ArrayList<>())
 						)
 		);
 	}
@@ -154,7 +154,7 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 				}
 			}
 
-			if (off < (2 << 14)) return;
+			if (off < 8192) return;
 
 			// modification starts from here
 

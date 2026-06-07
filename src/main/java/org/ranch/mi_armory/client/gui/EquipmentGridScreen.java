@@ -1,5 +1,6 @@
 package org.ranch.mi_armory.client.gui;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -18,6 +19,7 @@ public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridCo
 	public static final ResourceLocation ENTRY_SLOT = MiArmory.location("textures/gui/container/entry_slot.png");
 
 	private final int TILE_SIZE = 18;
+	private final int GRID_GUI_SIZE = 4;
 	private int gridX;
 	private int gridY;
 
@@ -39,22 +41,27 @@ public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridCo
 
 		EquipmentGrid grid = menu.getEquipmentGrid();
 		if (grid != null) {
-			guiGraphics.enableScissor(gridX, gridY, gridX + TILE_SIZE * grid.width(), gridY + TILE_SIZE * grid.height());
-			renderGrid(grid, guiGraphics, gridX, gridY, TILE_SIZE);
+			//guiGraphics.enableScissor(gridX, gridY, gridX + TILE_SIZE * grid.width(), gridY + TILE_SIZE * grid.height());
+			PoseStack pose = guiGraphics.pose();
+			pose.pushPose();
+			pose.translate(gridX, gridY, 0);
+			pose.scale((float) GRID_GUI_SIZE / grid.width(), (float) GRID_GUI_SIZE / grid.height(), 1);
+			renderGrid(grid, guiGraphics, 0, 0, TILE_SIZE);
 			if (!menu.getCarried().isEmpty() && ModuleList.hasItem(menu.getCarried().getItem())) {
-				int[] mpos = mouseToGridPos(mouseX, mouseY, gridX, gridY, TILE_SIZE, ModuleList.getFromItem(menu.getCarried().getItem()).width, ModuleList.getFromItem(menu.getCarried().getItem()).height);
+				int[] mpos = mouseToGridPos(mouseX, mouseY, gridX, gridY, TILE_SIZE, ModuleList.getFromItem(menu.getCarried().getItem()).width, ModuleList.getFromItem(menu.getCarried().getItem()).height, grid);
 				if (grid.inBounds(mpos[0], mpos[1])) {
 					boolean fits = grid.canAdd(new EquipmentGrid.Entry(mpos[0], mpos[1], menu.getCarried().copy()));
 					Module m = ModuleList.getFromItem(menu.getCarried().getItem());
 					guiGraphics.renderOutline(
-							gridX + mpos[0] * TILE_SIZE,
-							gridY + mpos[1] * TILE_SIZE,
+							mpos[0] * TILE_SIZE,
+							mpos[1] * TILE_SIZE,
 							m.width * TILE_SIZE,
 							m.height * TILE_SIZE,
 							fits ? 0x88FFFFFF : 0x88FF4444);
 				}
 			}
-			guiGraphics.disableScissor();
+			pose.popPose();
+			//guiGraphics.disableScissor();
 		}
 	}
 
@@ -72,11 +79,11 @@ public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridCo
 		}
 	}
 
-	public int[] mouseToGridPos(double x, double y, int gx, int gy, int tileSize, int entryW, int entryH) {
+	public int[] mouseToGridPos(double x, double y, int gx, int gy, int tileSize, int entryW, int entryH, EquipmentGrid grid) {
 		x -= entryW * tileSize / 2.0 - tileSize / 2.0;
 		y -= entryH * tileSize / 2.0 - tileSize / 2.0;
-		double rx = x - gx;
-		double ry = y - gy;
+		double rx = (x - gx) * (float) grid.width() / GRID_GUI_SIZE;
+		double ry = (y - gy) * (float) grid.height() / GRID_GUI_SIZE;
 		int grx = (int) Math.floor(rx / tileSize);
 		int gry = (int) Math.floor(ry / tileSize);
 		return new int[]{grx, gry};
@@ -88,10 +95,11 @@ public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridCo
 		if (m == null) {
 			m = new NullModule();
 		}
-		int[] mpos = mouseToGridPos(x, y, gridX, gridY, TILE_SIZE, m.width, m.height);
 		EquipmentGrid grid = menu.getEquipmentGrid();
-		if (grid != null && grid.inBounds(mpos[0], mpos[1])) {
-			menu.onGridClick(mpos[0], mpos[1]);
+		if (grid != null) {
+			int[] mpos = mouseToGridPos(x, y, gridX, gridY, TILE_SIZE, m.width, m.height, grid);
+			if (grid.inBounds(mpos[0], mpos[1]))
+				menu.onGridClick(mpos[0], mpos[1]);
 		}
 
 		return super.mouseClicked(x, y, p_97750_);
@@ -103,10 +111,11 @@ public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridCo
 		if (m == null) {
 			m = new NullModule();
 		}
-		int[] mpos = mouseToGridPos(x, y, gridX, gridY, TILE_SIZE, m.width, m.height);
 		EquipmentGrid grid = menu.getEquipmentGrid();
-		if (grid != null && grid.inBounds(mpos[0], mpos[1])) {
-			return true;
+		if (grid != null) {
+			int[] mpos = mouseToGridPos(x, y, gridX, gridY, TILE_SIZE, m.width, m.height, grid);
+			if (grid.inBounds(mpos[0], mpos[1]))
+				return true;
 		}
 
 		return super.mouseReleased(x, y, p_97814_);

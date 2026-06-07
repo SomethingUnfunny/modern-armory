@@ -79,9 +79,9 @@ public class ModuleList {
 				new Module(
 						"large_advanced_motor",
 						2, 4,
-						drawPerBaseBoost * 20 * 2,
+						drawPerBaseBoost * 10,
 						List.of(
-								new Module.AddedAttribute(Attributes.MOVEMENT_SPEED, baseMotorBoost * 20, AttributeModifier.Operation.ADD_VALUE)
+								new Module.AddedAttribute(Attributes.MOVEMENT_SPEED, baseMotorBoost * 10, AttributeModifier.Operation.ADD_VALUE)
 						),
 						EquipmentSlotGroup.LEGS
 				)
@@ -118,8 +118,8 @@ public class ModuleList {
 				new ShieldModule(
 						"blastproof_plate",
 						2, 2,
-						5f,
-						0.05f
+						2.5f,
+						0.01f
 				)
 		);
 

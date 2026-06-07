@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "mi_armory:item/modular_boots"
+    "layer0": "mi_armory:item/modular_2_boots"
   }
 }

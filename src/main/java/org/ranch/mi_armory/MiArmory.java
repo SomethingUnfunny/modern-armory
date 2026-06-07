@@ -163,7 +163,7 @@ public class MiArmory {
 
 				float missing = (float) (maxShield - shield);
 				float toCharge = Math.min(chargeAmount, missing);
-				long chargeCost = (long) (toCharge * 256);
+				long chargeCost = (long) (toCharge * MiArmoryConstants.SHIELD_COST);
 
 				long perPiece = chargeCost / shields.size();
 				float chargePerPiece = toCharge / shields.size();

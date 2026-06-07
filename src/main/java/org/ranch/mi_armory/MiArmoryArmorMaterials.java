@@ -42,8 +42,29 @@ public class MiArmoryArmorMaterials {
                     0.20f
             ));
 
-	public static final Holder<ArmorMaterial> MODULAR =
-			ARMOR_MATERIALS.register("modular_armor", () -> new ArmorMaterial(
+	public static final Holder<ArmorMaterial> MODULAR_TIER_1 =
+			ARMOR_MATERIALS.register("modular_1", () -> new ArmorMaterial(
+					Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+						map.put(ArmorItem.Type.BOOTS, 2);
+						map.put(ArmorItem.Type.LEGGINGS, 5);
+						map.put(ArmorItem.Type.CHESTPLATE, 6);
+						map.put(ArmorItem.Type.HELMET, 2);
+						map.put(ArmorItem.Type.BODY, 5);
+					}),
+					0,
+					SoundEvents.ARMOR_EQUIP_GENERIC,
+					() -> Ingredient.of(MIMaterials.CARBON.getPart(MIParts.PLATE).asItem()),
+					List.of(
+							new ArmorMaterial.Layer(
+									MiArmory.location("modular_1")
+							)
+					),
+					5,
+					0.0f
+			));
+
+	public static final Holder<ArmorMaterial> MODULAR_TIER_2 =
+			ARMOR_MATERIALS.register("modular_2", () -> new ArmorMaterial(
 					Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
 						map.put(ArmorItem.Type.BOOTS, 3);
 						map.put(ArmorItem.Type.LEGGINGS, 6);
@@ -53,14 +74,14 @@ public class MiArmoryArmorMaterials {
 					}),
 					0,
 					SoundEvents.ARMOR_EQUIP_GENERIC,
-					() -> Ingredient.of(MIMaterials.BLASTPROOF_ALLOY.getPart(MIParts.LARGE_PLATE).asItem()),
+					() -> Ingredient.of(MIMaterials.IRIDIUM.getPart(MIParts.INGOT).asItem()),
 					List.of(
 							new ArmorMaterial.Layer(
-									MiArmory.location("modular")
+									MiArmory.location("modular_2")
 							)
 					),
 					5,
-					0.20f
+					0.0f
 			));
 
     public static void register(IEventBus modEventBus) {

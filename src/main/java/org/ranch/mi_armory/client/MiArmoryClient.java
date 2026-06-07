@@ -58,7 +58,6 @@ public class MiArmoryClient {
 		if (maxShield <= 0) return;
 		Gui gui = Minecraft.getInstance().gui;
 		int w = (int) ((shield / maxShield) * 79);
-		MiArmory.LOGGER.info(String.valueOf(maxShield));
 		int x = guiGraphics.guiWidth() / 2 - 90;
 		int y = guiGraphics.guiHeight() - gui.leftHeight - 9;
 		guiGraphics.blit(SHIELD_BAR, x - 1, y - 1, 0, 0, 81, 9, 81, 9);
