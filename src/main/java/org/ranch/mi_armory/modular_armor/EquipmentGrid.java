@@ -6,6 +6,7 @@ import net.minecraft.world.item.ItemStack;
 import org.ranch.mi_armory.MiArmory;
 import org.ranch.mi_armory.MiArmoryComponents;
 import org.ranch.mi_armory.MiArmoryDamageTypes;
+import org.ranch.mi_armory.modular_armor.custom_modules.NullModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +82,12 @@ public record EquipmentGrid(int width, int height, List<Entry> modules) {
 		);
 
 		public Module module() {
-			return ModuleList.getFromItem(stack.getItem());
+			Module m = ModuleList.getFromItem(stack.getItem());
+			if (m == null) {
+				return new NullModule();
+			} else  {
+				return m;
+			}
 		}
 
 		public int width() {
@@ -99,7 +105,7 @@ public record EquipmentGrid(int width, int height, List<Entry> modules) {
 
 		public boolean touching(Entry other) {
 			return x < other.x() + other.width() && x + width() > other.x()
-					&& y < other.y() + other.width() && y + width() > other.y();
+					&& y < other.y() + other.height() && y + height() > other.y();
 		}
 	}
 }

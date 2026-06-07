@@ -40,13 +40,13 @@ public class Module {
 	}
 
 	// todo merge same attributes so they dont fill up the tooltip
-	public ItemAttributeModifiers.Builder addAttributes(ItemAttributeModifiers.Builder builder, ItemStack stack, ArmorItem.Type type) {
+	public ItemAttributeModifiers.Builder addAttributes(ItemAttributeModifiers.Builder builder, ItemStack stack, ArmorItem.Type type, int i) {
 		EquipmentSlotGroup equipmentslotgroup = EquipmentSlotGroup.bySlot(type.getSlot());
 		for (AddedAttribute attribute : attributes) {
 			builder.add(
 					attribute.attribute,
 					new AttributeModifier(
-							MiArmory.location("modular_armor." + type.getName() + "." + id),
+							MiArmory.location("modular_armor." + type.getName() + "." + id + "." + i),
 							attribute.value,
 							attribute.operation
 					),

@@ -12,6 +12,8 @@ import net.minecraft.world.item.ItemStack;
 import org.ranch.mi_armory.MiArmory;
 import org.ranch.mi_armory.modular_armor.EquipmentGrid;
 import org.ranch.mi_armory.modular_armor.EquipmentGridContainerMenu;
+import org.ranch.mi_armory.modular_armor.Module;
+import org.ranch.mi_armory.modular_armor.ModuleList;
 import org.ranch.mi_armory.network.PacketEquipmentGridClick;
 
 public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridContainerMenu> {
@@ -42,6 +44,19 @@ public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridCo
 		EquipmentGrid grid = menu.getEquipmentGrid();
 		if (grid != null) {
 			renderGrid(grid, guiGraphics, gridX, gridY, TILE_SIZE);
+			if (!menu.getCarried().isEmpty() && ModuleList.hasItem(menu.getCarried().getItem())) {
+				int[] mpos = mouseToGridPos(mouseX, mouseY, gridX, gridY, TILE_SIZE);
+				if (grid.inBounds(mpos[0], mpos[1])) {
+					boolean fits = grid.canAdd(new EquipmentGrid.Entry(mpos[0], mpos[1], menu.getCarried().copy()));
+					Module m = ModuleList.getFromItem(menu.getCarried().getItem());
+					guiGraphics.renderOutline(
+							gridX + mpos[0] * TILE_SIZE,
+							gridY + mpos[1] * TILE_SIZE,
+							m.width * TILE_SIZE,
+							m.height * TILE_SIZE,
+							fits ? 0x88FFFFFF : 0x88FF4444);
+				}
+			}
 		}
 	}
 

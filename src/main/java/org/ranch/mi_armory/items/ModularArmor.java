@@ -1,20 +1,26 @@
 package org.ranch.mi_armory.items;
 
 import aztech.modern_industrialization.MIComponents;
+import aztech.modern_industrialization.MIText;
+import aztech.modern_industrialization.MITooltips;
 import dev.technici4n.grandpower.api.ISimpleEnergyItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
+import org.ranch.mi_armory.MiArmory;
 import org.ranch.mi_armory.MiArmoryArmorMaterials;
 import org.ranch.mi_armory.MiArmoryComponents;
 import org.ranch.mi_armory.modular_armor.EquipmentGrid;
@@ -25,7 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
-	public static final long BASE_ENERGY_CAPACITY = 0;
+	public static final long BASE_ENERGY_CAPACITY = 2 << 15;
+	private static final EquipmentSlot[] EQUIPMENT_SLOTS = new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
 
 	public ModularArmor(Type type) {
 		super(MiArmoryArmorMaterials.MODULAR, type,
@@ -47,8 +54,10 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 
 		EquipmentGrid grid = EquipmentGrid.getGridData(stack);
 		if (grid != null) {
+			int i = 0;
 			for (EquipmentGrid.Entry entry : grid.modules()) {
-				entry.module().addAttributes(attributesBuilder, stack, type);
+				if (getStoredEnergy(stack) < entry.module().powerDraw()) continue; // power is taken in inventoryTick
+				entry.module().addAttributes(attributesBuilder, stack, type, i++);
 			}
 		}
 
@@ -95,9 +104,91 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 	}
 
 	@Override
-	public void inventoryTick(ItemStack stack, Level level, Entity entity, int p_41407_, boolean p_41408_) {
-		super.inventoryTick(stack, level, entity, p_41407_, p_41408_);
+	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean p_41408_) {
+		super.inventoryTick(stack, level, entity, slotId, p_41408_);
 		this.setStoredEnergy(stack, Math.min(getEnergyCapacity(stack), getStoredEnergy(stack)));
+		if (slotId > 35 && slotId < 40) {
+			armorTick(stack, level, entity, slotId, p_41408_);
+		}
+	}
+
+	private void armorTick(ItemStack stack, Level level, Entity entity, int slotId, boolean p_41408_) {
+		if (entity instanceof Player p && !level.isClientSide()) {
+			distributeEnergy(p);
+		}
+
+		EquipmentGrid grid = EquipmentGrid.getGridData(stack);
+		if (grid != null) {
+			for (EquipmentGrid.Entry entry : grid.modules()) {
+				this.tryUseEnergy(stack, entry.module().powerDraw());
+			}
+		}
+	}
+
+	private void distributeEnergy(Player p) { // god smite this bullshit
+		long totalMax = 0;
+		long total = 0;
+		int pieces = 0;
+		EquipmentSlot first = null;
+		for (EquipmentSlot slot : EQUIPMENT_SLOTS) { // collect total energy and amount of pieces
+			ItemStack sStack = p.getItemBySlot(slot);
+			if (isArmor(sStack)) {
+				total += getStoredEnergy(sStack);
+				totalMax += getEnergyCapacity(sStack);
+				pieces++;
+				if (first == null) {
+					first = slot;
+				}
+			}
+		}
+
+		if ((total > 0 || pieces > 0) && first == type.getSlot()) {
+			double filled = (double) total / totalMax;
+			long newTotal = 0;
+
+			long off = 0;
+			for (EquipmentSlot slot : EQUIPMENT_SLOTS) { // see if already kinda balanced
+				ItemStack sStack = p.getItemBySlot(slot);
+				if (isArmor(sStack)) {
+					long newValue = (long) (getEnergyCapacity(sStack) * filled);
+					off += Math.abs(newValue - getStoredEnergy(sStack));
+				}
+			}
+
+			//MiArmory.LOGGER.info(String.valueOf(off));
+
+			if (off < (2 << 10)) return;
+
+			// modification starts from here
+
+			for (EquipmentSlot slot : EQUIPMENT_SLOTS) { // set every piece to the % of the total
+				ItemStack sStack = p.getItemBySlot(slot);
+				if (isArmor(sStack)) {
+					long newValue = (long) (getEnergyCapacity(sStack) * filled);
+					setStoredEnergy(sStack, newValue);
+					newTotal += newValue;
+				}
+			}
+
+			long error = newTotal - total;
+			MiArmory.LOGGER.info(String.valueOf(error));
+			if (error != 0) {
+				for (EquipmentSlot slot : EQUIPMENT_SLOTS) { // correct for error
+					ItemStack sStack = p.getItemBySlot(slot);
+					if (isArmor(sStack)) {
+						long canAdd = getEnergyCapacity(sStack) - getStoredEnergy(sStack);
+						long toAdd = Math.clamp(error, -getStoredEnergy(sStack), canAdd);
+						long newValue = getStoredEnergy(sStack) + toAdd;
+						setStoredEnergy(sStack, newValue);
+						error -= toAdd;
+					}
+				}
+			}
+		}
+	}
+
+	public boolean isArmor(ItemStack stack) {
+		return stack.getItem() instanceof ModularArmor;
 	}
 
 	@Override
@@ -140,7 +231,7 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 
 	@Override
 	public int getBarWidth(ItemStack stack) {
-		return (int) Math.round(getStoredEnergy(stack) / (double) getEnergyCapacity(stack) * 13);
+		return Math.min((int) Math.round(getStoredEnergy(stack) / (double) getEnergyCapacity(stack) * 13), 13);
 	}
 
 	@Override
@@ -149,11 +240,10 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 		if (energy == null) {
 			energy = 0L;
 		}
-		NumberFormat formatter = new DecimalFormat("#0");
-		String energyFormatted = formatter.format(energy);
-		String totalFormatted = formatter.format(getEnergyCapacity(stack));
-		String percentFormatted = formatter.format(((float) energy / getEnergyCapacity(stack)) * 100);
-		Component energyComponent = Component.literal(energyFormatted + " / " + totalFormatted + " EU " + "(" + percentFormatted + "%)").withStyle(Style.EMPTY.withColor(TextColor.fromRgb(16768637)).withItalic(false));
-		tooltipComponents.add(Component.literal("Energy Stored: ").withStyle(ChatFormatting.GRAY).append(energyComponent));
+
+		MutableComponent energyFormatted = new MITooltips.Line(MIText.EnergyStored).arg(new MITooltips.NumberWithMax(energy, getEnergyCapacity(stack)), MITooltips.EU_MAXED_PARSER).build();
+		String percentFormatted = String.valueOf((int) Math.floor(((float) energy / getEnergyCapacity(stack)) * 100));
+		MutableComponent percentComponent = Component.literal(" ("+percentFormatted+"%)").withStyle(Style.EMPTY.withColor(TextColor.fromRgb(16768637)));
+		tooltipComponents.add(energyFormatted.append(percentComponent));
 	}
 }

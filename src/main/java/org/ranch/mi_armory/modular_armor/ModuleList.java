@@ -1,9 +1,11 @@
 package org.ranch.mi_armory.modular_armor;
 
+import aztech.modern_industrialization.MI;
 import aztech.modern_industrialization.items.PortableStorageUnit;
 import aztech.modern_industrialization.materials.MIMaterials;
 import aztech.modern_industrialization.materials.Material;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
@@ -19,6 +21,10 @@ public class ModuleList {
 
 	public static void addModule(String key, Module module) {
 		modules.put(key, module);
+	}
+
+	public static void addModule(ResourceLocation key, Module module) {
+		modules.put(key.toString(), module);
 	}
 
 	public static HashMap<String, Module> getModules() {
@@ -42,30 +48,73 @@ public class ModuleList {
 	}
 
 	static {
+		addBattery(MIMaterials.REDSTONE);
+		addBattery(MIMaterials.SODIUM);
+		addBattery(MIMaterials.SILICON);
+		addBattery(MIMaterials.CADMIUM);
+		addBattery(MIMaterials.PLUTONIUM);
+
+		double baseMotorBoost = 0.01;
+		long drawPerBaseBoost = 16;
+
 		addModule(
-				"minecraft:diamond",
+				MI.id("motor"),
 				new Module(
-						"diamond",
-						2,
-						2,
-						100,
+						"motor",
+						2, 1,
+						drawPerBaseBoost,
 						0,
 						List.of(
-								new Module.AddedAttribute(
-										Attributes.JUMP_STRENGTH,
-										0.1,
-										AttributeModifier.Operation.ADD_VALUE
-								)
+								new Module.AddedAttribute(Attributes.MOVEMENT_SPEED, baseMotorBoost, AttributeModifier.Operation.ADD_VALUE)
 						)
 				)
 		);
 		addModule(
-				"modern_industrialization:redstone_battery",
+				MI.id("large_motor"),
+				new Module(
+						"large_motor",
+						2, 4,
+						drawPerBaseBoost * 5,
+						0,
+						List.of(
+								new Module.AddedAttribute(Attributes.MOVEMENT_SPEED, baseMotorBoost * 5, AttributeModifier.Operation.ADD_VALUE)
+						)
+				)
+		);
+		addModule(
+				MI.id("advanced_motor"),
+				new Module(
+						"advanced_motor",
+						2, 1,
+						drawPerBaseBoost * 4 * 2,
+						0,
+						List.of(
+								new Module.AddedAttribute(Attributes.MOVEMENT_SPEED, baseMotorBoost * 4, AttributeModifier.Operation.ADD_VALUE)
+						)
+				)
+		);
+		addModule(
+				MI.id("large_advanced_motor"),
+				new Module(
+						"large_advanced_motor",
+						2, 4,
+						drawPerBaseBoost * 20 * 2,
+						0,
+						List.of(
+								new Module.AddedAttribute(Attributes.MOVEMENT_SPEED, baseMotorBoost * 20, AttributeModifier.Operation.ADD_VALUE)
+						)
+				)
+		);
+	}
+
+	private static void addBattery(Material material) {
+		addModule(
+				"modern_industrialization:" + material.name + "_battery",
 				new BatteryModule(
-						"redstone_battery",
+						material.name + "_battery",
 						1,
 						2,
-						MIMaterials.REDSTONE,
+						material,
 						List.of()
 				)
 		);
