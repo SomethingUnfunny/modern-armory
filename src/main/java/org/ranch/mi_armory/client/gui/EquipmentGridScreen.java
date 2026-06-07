@@ -1,20 +1,16 @@
 package org.ranch.mi_armory.client.gui;
 
-import aztech.modern_industrialization.MI;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
 import org.ranch.mi_armory.MiArmory;
 import org.ranch.mi_armory.modular_armor.EquipmentGrid;
 import org.ranch.mi_armory.modular_armor.EquipmentGridContainerMenu;
 import org.ranch.mi_armory.modular_armor.Module;
 import org.ranch.mi_armory.modular_armor.ModuleList;
-import org.ranch.mi_armory.network.PacketEquipmentGridClick;
+import org.ranch.mi_armory.modular_armor.custom_modules.NullModule;
 
 public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridContainerMenu> {
 	public static final ResourceLocation EQUIPMENT_GRID_GUI = MiArmory.location("textures/gui/container/equipment_grid.png");
@@ -43,11 +39,13 @@ public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridCo
 
 		EquipmentGrid grid = menu.getEquipmentGrid();
 		if (grid != null) {
+			guiGraphics.enableScissor(gridX, gridY, gridX + TILE_SIZE * grid.width(), gridY + TILE_SIZE * grid.height());
 			renderGrid(grid, guiGraphics, gridX, gridY, TILE_SIZE);
 			if (!menu.getCarried().isEmpty() && ModuleList.hasItem(menu.getCarried().getItem())) {
-				int[] mpos = mouseToGridPos(mouseX, mouseY, gridX, gridY, TILE_SIZE);
+				EquipmentGrid.Entry fake = new EquipmentGrid.Entry(0, 0, menu.getCarried().copy());
+				int[] mpos = mouseToGridPos(mouseX, mouseY, gridX, gridY, TILE_SIZE, ModuleList.getFromItem(menu.getCarried().getItem()).width, ModuleList.getFromItem(menu.getCarried().getItem()).height);
 				if (grid.inBounds(mpos[0], mpos[1])) {
-					boolean fits = grid.canAdd(new EquipmentGrid.Entry(mpos[0], mpos[1], menu.getCarried().copy()));
+					boolean fits = grid.canAdd(fake);
 					Module m = ModuleList.getFromItem(menu.getCarried().getItem());
 					guiGraphics.renderOutline(
 							gridX + mpos[0] * TILE_SIZE,
@@ -57,6 +55,7 @@ public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridCo
 							fits ? 0x88FFFFFF : 0x88FF4444);
 				}
 			}
+			guiGraphics.disableScissor();
 		}
 	}
 
@@ -74,7 +73,9 @@ public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridCo
 		}
 	}
 
-	public int[] mouseToGridPos(double x, double y, int gx, int gy, int tileSize) {
+	public int[] mouseToGridPos(double x, double y, int gx, int gy, int tileSize, int entryW, int entryH) {
+		x -= entryW * tileSize / 2.0 - tileSize / 2.0;
+		y -= entryH * tileSize / 2.0 - tileSize / 2.0;
 		double rx = x - gx;
 		double ry = y - gy;
 		int grx = (int) Math.floor(rx / tileSize);
@@ -84,21 +85,31 @@ public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridCo
 
 	@Override
 	public boolean mouseClicked(double x, double y, int p_97750_) {
-		int[] mpos = mouseToGridPos(x, y, gridX, gridY, TILE_SIZE);
+		Module m = ModuleList.getFromItem(menu.getCarried().getItem());
+		if (m == null) {
+			m = new NullModule();
+		}
+		int[] mpos = mouseToGridPos(x, y, gridX, gridY, TILE_SIZE, m.width, m.height);
 		EquipmentGrid grid = menu.getEquipmentGrid();
 		if (grid != null && grid.inBounds(mpos[0], mpos[1])) {
 			menu.onGridClick(mpos[0], mpos[1]);
 		}
+
 		return super.mouseClicked(x, y, p_97750_);
 	}
 
 	@Override
 	public boolean mouseReleased(double x, double y, int p_97814_) {
-		int[] mpos = mouseToGridPos(x, y, gridX, gridY, TILE_SIZE);
+		Module m = ModuleList.getFromItem(menu.getCarried().getItem());
+		if (m == null) {
+			m = new NullModule();
+		}
+		int[] mpos = mouseToGridPos(x, y, gridX, gridY, TILE_SIZE, m.width, m.height);
 		EquipmentGrid grid = menu.getEquipmentGrid();
 		if (grid != null && grid.inBounds(mpos[0], mpos[1])) {
 			return true;
 		}
+
 		return super.mouseReleased(x, y, p_97814_);
 	}
 

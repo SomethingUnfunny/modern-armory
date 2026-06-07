@@ -6,6 +6,6 @@ import java.util.List;
 
 public class NullModule extends Module {
 	public NullModule() {
-		super("null", 1, 1, 0, 0, List.of());
+		super("null", 1, 1, 0, List.of());
 	}
 }

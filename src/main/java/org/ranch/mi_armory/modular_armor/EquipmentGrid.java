@@ -2,7 +2,9 @@ package org.ranch.mi_armory.modular_armor;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.common.util.NeoForgeExtraCodecs;
 import org.ranch.mi_armory.MiArmory;
 import org.ranch.mi_armory.MiArmoryComponents;
 import org.ranch.mi_armory.MiArmoryDamageTypes;

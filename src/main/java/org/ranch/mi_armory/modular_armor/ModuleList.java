@@ -6,10 +6,13 @@ import aztech.modern_industrialization.materials.MIMaterials;
 import aztech.modern_industrialization.materials.Material;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
+import org.ranch.mi_armory.MiArmoryAttributes;
 import org.ranch.mi_armory.modular_armor.custom_modules.BatteryModule;
+import org.ranch.mi_armory.modular_armor.custom_modules.SolarPanelModule;
 import org.ranch.mi_armory.util.UnfunUtil;
 
 import java.util.HashMap;
@@ -58,39 +61,15 @@ public class ModuleList {
 		long drawPerBaseBoost = 16;
 
 		addModule(
-				MI.id("motor"),
-				new Module(
-						"motor",
-						2, 1,
-						drawPerBaseBoost,
-						0,
-						List.of(
-								new Module.AddedAttribute(Attributes.MOVEMENT_SPEED, baseMotorBoost, AttributeModifier.Operation.ADD_VALUE)
-						)
-				)
-		);
-		addModule(
 				MI.id("large_motor"),
 				new Module(
 						"large_motor",
 						2, 4,
 						drawPerBaseBoost * 5,
-						0,
 						List.of(
 								new Module.AddedAttribute(Attributes.MOVEMENT_SPEED, baseMotorBoost * 5, AttributeModifier.Operation.ADD_VALUE)
-						)
-				)
-		);
-		addModule(
-				MI.id("advanced_motor"),
-				new Module(
-						"advanced_motor",
-						2, 1,
-						drawPerBaseBoost * 4 * 2,
-						0,
-						List.of(
-								new Module.AddedAttribute(Attributes.MOVEMENT_SPEED, baseMotorBoost * 4, AttributeModifier.Operation.ADD_VALUE)
-						)
+						),
+						EquipmentSlotGroup.LEGS
 				)
 		);
 		addModule(
@@ -99,10 +78,45 @@ public class ModuleList {
 						"large_advanced_motor",
 						2, 4,
 						drawPerBaseBoost * 20 * 2,
-						0,
 						List.of(
 								new Module.AddedAttribute(Attributes.MOVEMENT_SPEED, baseMotorBoost * 20, AttributeModifier.Operation.ADD_VALUE)
-						)
+						),
+						EquipmentSlotGroup.LEGS
+				)
+		);
+
+		addModule(
+				MI.id("piston"),
+				new Module(
+						"piston",
+						1, 2,
+						16,
+						List.of(
+								new Module.AddedAttribute(Attributes.JUMP_STRENGTH, 0.05, AttributeModifier.Operation.ADD_VALUE)
+						),
+						EquipmentSlotGroup.FEET
+				)
+		);
+
+		addModule(
+				MI.id("blastproof_alloy_large_plate"),
+				new Module(
+						"blastproof_plate",
+						3, 3,
+						0,
+						List.of(
+								new Module.AddedAttribute(MiArmoryAttributes.SHOCKWAVE_RESISTANCE, 0.05, AttributeModifier.Operation.ADD_VALUE)
+						),
+						EquipmentSlotGroup.ANY
+				)
+		);
+
+		addModule(
+				MI.id("silicon_plate"),
+				new SolarPanelModule(
+						"solar_panel",
+						1, 1,
+						0.25, 2
 				)
 		);
 	}

@@ -12,5 +12,11 @@
   "mi_armory.detonator.tooltip": "Linked with nuke at:",
   "mi_armory.multi_detonator.tooltip": "Linked with nukes at:",
   "mi_armory.detonator.message": "Linked Nuke",
-  "mi_armory.has_module": "Can be installed into modular Armor."
+  "mi_armory.has_module": "Can be installed into an Equipment Grid.",
+  "mi_armory.has_grid": "Has an Equipment Grid.",
+  "mi_armory.fits_in.any": "",
+  "mi_armory.fits_in.head": "(Only Helmet)",
+  "mi_armory.fits_in.chest": "(Only Chestplate)",
+  "mi_armory.fits_in.legs": "(Only Leggings)",
+  "mi_armory.fits_in.feet": "(Only Boots)"
 }

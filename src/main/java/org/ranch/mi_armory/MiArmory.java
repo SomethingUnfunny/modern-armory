@@ -65,6 +65,7 @@ public class MiArmory {
 		MiArmoryArmorMaterials.register(modEventBus);
 		MiArmoryAttributes.register(modEventBus);
 		MiArmoryBlocks.register(modEventBus);
+		MiArmoryAttachmentTypes.register(modEventBus);
 		MENUS.register(modEventBus);
 
 		// Register our mod's ModConfigSpec so that FML can create and load the config file for us

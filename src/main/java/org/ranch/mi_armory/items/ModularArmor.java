@@ -107,20 +107,21 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean p_41408_) {
 		super.inventoryTick(stack, level, entity, slotId, p_41408_);
 		this.setStoredEnergy(stack, Math.min(getEnergyCapacity(stack), getStoredEnergy(stack)));
-		if (slotId > 35 && slotId < 40) {
-			armorTick(stack, level, entity, slotId, p_41408_);
+		if (slotId > 35 && slotId < 40 && entity instanceof Player p) {
+			armorTick(stack, level, p, slotId, p_41408_);
 		}
 	}
 
-	private void armorTick(ItemStack stack, Level level, Entity entity, int slotId, boolean p_41408_) {
-		if (entity instanceof Player p && !level.isClientSide()) {
-			distributeEnergy(p);
+	private void armorTick(ItemStack stack, Level level, Player player, int slotId, boolean p_41408_) {
+		if (!level.isClientSide()) {
+			distributeEnergy(player);
 		}
 
 		EquipmentGrid grid = EquipmentGrid.getGridData(stack);
 		if (grid != null) {
 			for (EquipmentGrid.Entry entry : grid.modules()) {
 				this.tryUseEnergy(stack, entry.module().powerDraw());
+				this.setStoredEnergy(stack, Math.min(getEnergyCapacity(stack), getStoredEnergy(stack) + entry.module().powerGen(level, player)));
 			}
 		}
 	}
@@ -155,9 +156,7 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 				}
 			}
 
-			//MiArmory.LOGGER.info(String.valueOf(off));
-
-			if (off < (2 << 10)) return;
+			if (off < (2 << 14)) return;
 
 			// modification starts from here
 
@@ -245,5 +244,6 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 		String percentFormatted = String.valueOf((int) Math.floor(((float) energy / getEnergyCapacity(stack)) * 100));
 		MutableComponent percentComponent = Component.literal(" ("+percentFormatted+"%)").withStyle(Style.EMPTY.withColor(TextColor.fromRgb(16768637)));
 		tooltipComponents.add(energyFormatted.append(percentComponent));
+		tooltipComponents.add(Component.translatable("mi_armory.has_grid").withStyle(ChatFormatting.GRAY));
 	}
 }

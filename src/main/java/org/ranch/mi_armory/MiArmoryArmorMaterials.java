@@ -1,5 +1,9 @@
 package org.ranch.mi_armory;
 
+import aztech.modern_industrialization.materials.MIMaterials;
+import aztech.modern_industrialization.materials.part.MIParts;
+import aztech.modern_industrialization.materials.part.PartKey;
+import aztech.modern_industrialization.materials.part.PartKeyProvider;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -49,7 +53,7 @@ public class MiArmoryArmorMaterials {
 					}),
 					0,
 					SoundEvents.ARMOR_EQUIP_GENERIC,
-					() -> Ingredient.of(),
+					() -> Ingredient.of(MIMaterials.BLASTPROOF_ALLOY.getPart(MIParts.LARGE_PLATE).asItem()),
 					List.of(
 							new ArmorMaterial.Layer(
 									MiArmory.location("modular")

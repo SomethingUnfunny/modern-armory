@@ -15,7 +15,7 @@ public class BatteryModule extends Module {
 	Item batteryMaterial;
 
 	public BatteryModule(String id, int width, int height, Material batteryMaterial, List<AddedAttribute> attributes) {
-		super(id, width, height, 0, 0, attributes);
+		super(id, width, height, 0, attributes);
 		MaterialItemPart part = batteryMaterial.getPart(new BatteryPart());
 		this.batteryMaterial = part.asItem();
 	}

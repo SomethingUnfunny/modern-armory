@@ -8,6 +8,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
 import org.ranch.mi_armory.MiArmory;
@@ -108,7 +109,7 @@ public class EquipmentGridContainerMenu extends AbstractContainerMenu {
 			} else if (!getCarried().isEmpty() && ModuleList.hasItem(getCarried().getItem())) { // add to grid
 				ItemStack carriedStack = getCarried().copy();
 				EquipmentGrid.Entry toAdd = new EquipmentGrid.Entry(x, y, carriedStack.copyWithCount(1));
-				if (grid.canAdd(toAdd)) {
+				if (grid.canAdd(toAdd) && toAdd.module().canInsert(((ArmorItem)armor.getItem().getItem()).getEquipmentSlot())) {
 					setEquipmentGrid(grid.add(toAdd));
 					carriedStack.setCount(carriedStack.getCount() - 1);
 					if (carriedStack.isEmpty()) {
