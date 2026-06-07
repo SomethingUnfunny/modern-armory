@@ -1,7 +1,5 @@
 package org.ranch.mi_armory;
 
-import aztech.modern_industrialization.MI;
-import aztech.modern_industrialization.blocks.forgehammer.ForgeHammerScreenHandler;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.NoopRenderer;
@@ -9,10 +7,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -23,23 +25,32 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
-import net.neoforged.neoforge.event.OnDatapackSyncEvent;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import org.ranch.mi_armory.client.MiArmoryClient;
 import org.ranch.mi_armory.client.gui.EquipmentGridScreen;
 import org.ranch.mi_armory.explosions.EntityNukeExplosion;
+import org.ranch.mi_armory.items.ModularArmor;
+import org.ranch.mi_armory.modular_armor.EquipmentGrid;
 import org.ranch.mi_armory.modular_armor.EquipmentGridContainerMenu;
+import org.ranch.mi_armory.modular_armor.custom_modules.ShieldModule;
 import org.ranch.mi_armory.network.PacketDetonation;
 import org.ranch.mi_armory.client.rendering.nuke.EntityNukeEffects;
 import org.ranch.mi_armory.client.rendering.nuke.EntityNukeEffectsRenderer;
 import org.ranch.mi_armory.network.PacketEquipmentGridClick;
+import org.ranch.mi_armory.network.PacketSyncEnergyShield;
 import org.slf4j.Logger;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 @Mod(MiArmory.MODID)
@@ -92,6 +103,7 @@ public class MiArmory {
 
 			registrar.playToClient(PacketDetonation.TYPE, PacketDetonation.STREAM_CODEC, PacketDetonation::handle);
 			registrar.playToServer(PacketEquipmentGridClick.TYPE, PacketEquipmentGridClick.STREAM_CODEC, PacketEquipmentGridClick::handle);
+			registrar.playToClient(PacketSyncEnergyShield.TYPE, PacketSyncEnergyShield.STREAM_CODEC, PacketSyncEnergyShield::handle);
 		}
 
 		@SubscribeEvent
@@ -100,20 +112,75 @@ public class MiArmory {
 					EntityType.PLAYER,
 					MiArmoryAttributes.SHOCKWAVE_RESISTANCE
 			);
-		}
-	}
-
-	@EventBusSubscriber(modid = MODID, value = Dist.CLIENT)
-	public static class ClientModEvents {
-		@SubscribeEvent
-		public static void onClientSetup(FMLClientSetupEvent event) {
-			EntityRenderers.register(MiArmoryEntities.NUKE.get(), NoopRenderer::new);
-			EntityRenderers.register(MiArmoryEntities.TOREX.get(), EntityNukeEffectsRenderer::new);
+			event.add(
+					EntityType.PLAYER,
+					MiArmoryAttributes.ENERGY_SHIELD
+			);
 		}
 
 		@SubscribeEvent
-		public static void registerScreens(RegisterMenuScreensEvent event) {
-			event.register(EQUIPMENT_GRID_MENU.get(), EquipmentGridScreen::new);
+		public static void onEntityHurt(LivingDamageEvent.Pre event) {
+			if (event.getEntity() instanceof Player p) {
+				float shield = p.getData(MiArmoryAttachmentTypes.ENERGY_SHIELD);
+				float damage = event.getNewDamage();
+				float blocked = Math.min(shield, damage);
+				if (blocked > 0) {
+					event.setNewDamage(damage - blocked);
+					p.setData(MiArmoryAttachmentTypes.ENERGY_SHIELD, shield - blocked);
+				}
+			}
+		}
+
+		@SubscribeEvent
+		public static void tickShields(PlayerTickEvent.Pre event) {
+
+			if (event.getEntity().level().isClientSide()) return;
+
+			float shield = event.getEntity().getData(MiArmoryAttachmentTypes.ENERGY_SHIELD);
+
+			double maxShield = event.getEntity().getAttributeValue(MiArmoryAttributes.ENERGY_SHIELD);
+			if (shield < maxShield) {
+				float chargeAmount = 0;
+				HashMap<EquipmentSlot, Integer> shields = new HashMap<>();
+				for (EquipmentSlot slot : ModularArmor.EQUIPMENT_SLOTS) {
+					ItemStack stack = event.getEntity().getItemBySlot(slot);
+					EquipmentGrid grid = EquipmentGrid.getGridData(stack);
+					if (grid != null) {
+						int amount = 0;
+						for (EquipmentGrid.Entry entry : grid.modules()) {
+							if (entry.module() instanceof ShieldModule sm) {
+								chargeAmount += sm.getChargeRate();
+								shields.put(slot, amount++);
+							}
+						}
+					}
+				}
+
+				if (shields.isEmpty()) {
+					PacketSyncEnergyShield.sendToPlayer((ServerPlayer) event.getEntity(), shield);
+					return;
+				}
+
+				float missing = (float) (maxShield - shield);
+				float toCharge = Math.min(chargeAmount, missing);
+				long chargeCost = (long) (toCharge * 256);
+
+				long perPiece = chargeCost / shields.size();
+				float chargePerPiece = toCharge / shields.size();
+				for (Map.Entry<EquipmentSlot, Integer> entry : shields.entrySet()) {
+					ItemStack stack = event.getEntity().getItemBySlot(entry.getKey());
+					if (stack.getItem() instanceof ModularArmor armor) {
+						if (armor.takeEnergy(stack, perPiece)) {
+							event.getEntity().setData(MiArmoryAttachmentTypes.ENERGY_SHIELD, event.getEntity().getData(MiArmoryAttachmentTypes.ENERGY_SHIELD) + chargePerPiece);
+						}
+					}
+				}
+			}
+			else if (shield > maxShield) {
+				event.getEntity().setData(MiArmoryAttachmentTypes.ENERGY_SHIELD, (float) maxShield);
+			}
+
+			PacketSyncEnergyShield.sendToPlayer((ServerPlayer) event.getEntity(), shield);
 		}
 	}
 

@@ -25,14 +25,12 @@ import org.ranch.mi_armory.MiArmoryArmorMaterials;
 import org.ranch.mi_armory.MiArmoryComponents;
 import org.ranch.mi_armory.modular_armor.EquipmentGrid;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 	public static final long BASE_ENERGY_CAPACITY = 2 << 15;
-	private static final EquipmentSlot[] EQUIPMENT_SLOTS = new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
+	public static final EquipmentSlot[] EQUIPMENT_SLOTS = new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
 
 	public ModularArmor(Type type) {
 		super(MiArmoryArmorMaterials.MODULAR, type,
@@ -184,6 +182,10 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 				}
 			}
 		}
+	}
+
+	public boolean takeEnergy(ItemStack stack, long amount) {
+		return this.tryUseEnergy(stack, amount);
 	}
 
 	public boolean isArmor(ItemStack stack) {

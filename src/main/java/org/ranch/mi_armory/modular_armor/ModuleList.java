@@ -10,8 +10,10 @@ import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import org.ranch.mi_armory.MiArmoryAttributes;
 import org.ranch.mi_armory.modular_armor.custom_modules.BatteryModule;
+import org.ranch.mi_armory.modular_armor.custom_modules.ShieldModule;
 import org.ranch.mi_armory.modular_armor.custom_modules.SolarPanelModule;
 import org.ranch.mi_armory.util.UnfunUtil;
 
@@ -108,6 +110,16 @@ public class ModuleList {
 								new Module.AddedAttribute(MiArmoryAttributes.SHOCKWAVE_RESISTANCE, 0.05, AttributeModifier.Operation.ADD_VALUE)
 						),
 						EquipmentSlotGroup.ANY
+				)
+		);
+
+		addModule(
+				MI.id("blastproof_alloy_plate"),
+				new ShieldModule(
+						"blastproof_plate",
+						2, 2,
+						5f,
+						0.05f
 				)
 		);
 

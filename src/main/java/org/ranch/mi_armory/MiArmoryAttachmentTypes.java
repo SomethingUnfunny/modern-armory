@@ -11,8 +11,8 @@ import java.util.function.Supplier;
 public class MiArmoryAttachmentTypes {
 	private static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, MiArmory.MODID);
 
-	private static final Supplier<AttachmentType<Double>> ENERGY_SHIELD = ATTACHMENT_TYPES.register(
-			"energy_shield", () -> AttachmentType.builder(() -> 0.0).serialize(Codec.DOUBLE).build()
+	public static final Supplier<AttachmentType<Float>> ENERGY_SHIELD = ATTACHMENT_TYPES.register(
+			"energy_shield", () -> AttachmentType.builder(() -> 0.0f).serialize(Codec.FLOAT).build()
 	);
 
 	public static void register(IEventBus modEventBus) {

@@ -42,10 +42,9 @@ public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridCo
 			guiGraphics.enableScissor(gridX, gridY, gridX + TILE_SIZE * grid.width(), gridY + TILE_SIZE * grid.height());
 			renderGrid(grid, guiGraphics, gridX, gridY, TILE_SIZE);
 			if (!menu.getCarried().isEmpty() && ModuleList.hasItem(menu.getCarried().getItem())) {
-				EquipmentGrid.Entry fake = new EquipmentGrid.Entry(0, 0, menu.getCarried().copy());
 				int[] mpos = mouseToGridPos(mouseX, mouseY, gridX, gridY, TILE_SIZE, ModuleList.getFromItem(menu.getCarried().getItem()).width, ModuleList.getFromItem(menu.getCarried().getItem()).height);
 				if (grid.inBounds(mpos[0], mpos[1])) {
-					boolean fits = grid.canAdd(fake);
+					boolean fits = grid.canAdd(new EquipmentGrid.Entry(mpos[0], mpos[1], menu.getCarried().copy()));
 					Module m = ModuleList.getFromItem(menu.getCarried().getItem());
 					guiGraphics.renderOutline(
 							gridX + mpos[0] * TILE_SIZE,
