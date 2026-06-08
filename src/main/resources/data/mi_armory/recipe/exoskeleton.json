@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "MGP",
+    " RR",
+    "MGP"
+  ],
+  "key": {
+    "M": {
+      "item": "modern_industrialization:advanced_motor"
+    },
+    "G": {
+      "item": "modern_industrialization:stainless_steel_gear"
+    },
+    "P": {
+      "item": "modern_industrialization:stainless_steel_plate"
+    },
+    "R": {
+      "item": "modern_industrialization:stainless_steel_rod"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "mi_armory:exoskeleton"
+  }
+}

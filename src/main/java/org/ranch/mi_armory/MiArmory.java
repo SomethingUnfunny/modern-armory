@@ -121,6 +121,10 @@ public class MiArmory {
 		@SubscribeEvent
 		public static void onEntityHurt(LivingDamageEvent.Pre event) {
 			if (event.getEntity() instanceof Player p) {
+				double maxShield = event.getEntity().getAttributeValue(MiArmoryAttributes.ENERGY_SHIELD);
+				if (p.getData(MiArmoryAttachmentTypes.ENERGY_SHIELD) > maxShield) {
+					p.setData(MiArmoryAttachmentTypes.ENERGY_SHIELD, (float) maxShield);
+				}
 				float shield = p.getData(MiArmoryAttachmentTypes.ENERGY_SHIELD);
 				float damage = event.getNewDamage();
 				float blocked = Math.min(shield, damage);
@@ -139,7 +143,7 @@ public class MiArmory {
 			float shield = event.getEntity().getData(MiArmoryAttachmentTypes.ENERGY_SHIELD);
 
 			double maxShield = event.getEntity().getAttributeValue(MiArmoryAttributes.ENERGY_SHIELD);
-			if (shield < maxShield) {
+			if (shield < maxShield && maxShield > 0) {
 				float chargeAmount = 0;
 				HashMap<EquipmentSlot, Integer> shields = new HashMap<>();
 				for (EquipmentSlot slot : ModularArmor.EQUIPMENT_SLOTS) {
@@ -175,9 +179,6 @@ public class MiArmory {
 						}
 					}
 				}
-			}
-			else if (shield > maxShield) {
-				event.getEntity().setData(MiArmoryAttachmentTypes.ENERGY_SHIELD, (float) maxShield);
 			}
 
 			PacketSyncEnergyShield.sendToPlayer((ServerPlayer) event.getEntity(), shield);

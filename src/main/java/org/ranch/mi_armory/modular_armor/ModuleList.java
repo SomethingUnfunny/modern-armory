@@ -11,10 +11,12 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import org.ranch.mi_armory.MiArmory;
 import org.ranch.mi_armory.MiArmoryAttributes;
 import org.ranch.mi_armory.modular_armor.custom_modules.BatteryModule;
 import org.ranch.mi_armory.modular_armor.custom_modules.ShieldModule;
 import org.ranch.mi_armory.modular_armor.custom_modules.SolarPanelModule;
+import org.ranch.mi_armory.modular_armor.custom_modules.SpeedModule;
 import org.ranch.mi_armory.util.UnfunUtil;
 
 import java.util.HashMap;
@@ -59,31 +61,39 @@ public class ModuleList {
 		addBattery(MIMaterials.CADMIUM);
 		addBattery(MIMaterials.PLUTONIUM);
 
-		double baseMotorBoost = 0.01;
+		double baseMotorBoost = 0.015;
 		long drawPerBaseBoost = 16;
 
 		addModule(
-				MI.id("large_motor"),
-				new Module(
-						"large_motor",
+				MiArmory.location("exoskeleton"),
+				new SpeedModule(
+						"exoskeleton",
 						2, 4,
-						drawPerBaseBoost * 5,
-						List.of(
-								new Module.AddedAttribute(Attributes.MOVEMENT_SPEED, baseMotorBoost * 5, AttributeModifier.Operation.ADD_VALUE)
-						),
-						EquipmentSlotGroup.LEGS
+						drawPerBaseBoost * 8,
+						baseMotorBoost * 8
 				)
 		);
+
 		addModule(
-				MI.id("large_advanced_motor"),
+				MI.id("motor"),
+				new SpeedModule(
+						"motor",
+						2, 1,
+						drawPerBaseBoost,
+						baseMotorBoost
+				)
+		);
+
+		addModule(
+				MI.id("iron_tank"),
 				new Module(
-						"large_advanced_motor",
-						2, 4,
-						drawPerBaseBoost * 10,
+						"iron_tank",
+						1, 1,
+						0,
 						List.of(
-								new Module.AddedAttribute(Attributes.MOVEMENT_SPEED, baseMotorBoost * 10, AttributeModifier.Operation.ADD_VALUE)
+								new Module.AddedAttribute(Attributes.OXYGEN_BONUS, 1, AttributeModifier.Operation.ADD_VALUE)
 						),
-						EquipmentSlotGroup.LEGS
+						EquipmentSlotGroup.HEAD
 				)
 		);
 
@@ -94,7 +104,7 @@ public class ModuleList {
 						1, 2,
 						16,
 						List.of(
-								new Module.AddedAttribute(Attributes.JUMP_STRENGTH, 0.05, AttributeModifier.Operation.ADD_VALUE)
+								new Module.AddedAttribute(Attributes.JUMP_STRENGTH, 0.06, AttributeModifier.Operation.ADD_VALUE)
 						),
 						EquipmentSlotGroup.FEET
 				)
@@ -104,31 +114,41 @@ public class ModuleList {
 				MI.id("blastproof_alloy_large_plate"),
 				new Module(
 						"blastproof_plate",
-						3, 3,
+						2, 2,
 						0,
 						List.of(
-								new Module.AddedAttribute(MiArmoryAttributes.SHOCKWAVE_RESISTANCE, 0.05, AttributeModifier.Operation.ADD_VALUE)
+								new Module.AddedAttribute(MiArmoryAttributes.SHOCKWAVE_RESISTANCE, 0.1, AttributeModifier.Operation.ADD_VALUE)
 						),
 						EquipmentSlotGroup.ANY
 				)
 		);
 
 		addModule(
-				MI.id("blastproof_alloy_plate"),
+				MiArmory.location("shield_module"),
 				new ShieldModule(
-						"blastproof_plate",
+						"shield_1",
 						2, 2,
-						2.5f,
-						0.01f
+						10f,
+						0.03f
 				)
 		);
 
 		addModule(
-				MI.id("silicon_plate"),
+				MiArmory.location("shield_module_2"),
+				new ShieldModule(
+						"shield_2",
+						2, 2,
+						20f,
+						0.06f
+				)
+		);
+
+		addModule(
+				MiArmory.location("solar_panel"),
 				new SolarPanelModule(
 						"solar_panel",
 						1, 1,
-						0.25, 2
+						0.5, 1
 				)
 		);
 	}

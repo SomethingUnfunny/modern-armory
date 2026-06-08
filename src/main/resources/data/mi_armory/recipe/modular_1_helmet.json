@@ -1,0 +1,44 @@
+{
+  "type": "modern_industrialization:assembler",
+  "eu": 32,
+  "duration": 400,
+  "item_inputs": [
+    {
+      "item" : "modern_industrialization:advanced_upgrade",
+      "amount": 8
+    },
+    {
+      "tag": "c:plates/carbon",
+      "amount": 16
+    },
+    {
+      "item" : "modern_industrialization:electronic_circuit",
+      "amount": 2
+    },
+    {
+      "item" : "modern_industrialization:redstone_battery",
+      "amount": 1
+    },
+    {
+      "tag" : "c:glass_panes",
+      "amount": 2
+    }
+  ],
+
+  "fluid_inputs": [
+    {
+      "fluid" : "modern_industrialization:polyethylene",
+      "amount" : 2000
+    },
+    {
+      "fluid" : "modern_industrialization:nylon",
+      "amount" : 2000
+    }
+  ],
+  "item_outputs": [
+    {
+      "item": "mi_armory:modular_1_helmet",
+      "amount": 1
+    }
+  ]
+}

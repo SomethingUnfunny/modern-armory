@@ -11,9 +11,10 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
+import org.apache.commons.lang3.function.TriFunction;
+import org.apache.logging.log4j.util.TriConsumer;
 import org.ranch.mi_armory.MiArmory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Module {
@@ -21,24 +22,27 @@ public class Module {
 	public final String id;
 	public final int width;
 	public final int height;
-	private final long basePowerDraw;
+	private final long maxPowerDraw;
+	private final TriFunction<Long, Player, Level, Long> powerFunction;
 	private List<AddedAttribute> attributes;
 	public final EquipmentSlotGroup validSlots;
 
-	public Module(String id, int width, int height, long powerDraw, List<AddedAttribute> attributes) {
+	public Module(String id, int width, int height, long maxPowerDraw, List<AddedAttribute> attributes, EquipmentSlotGroup validSlots) {
 		this.id = id;
 		this.width = width;
 		this.height = height;
-		this.basePowerDraw = powerDraw;
+		this.maxPowerDraw = maxPowerDraw;
+		this.powerFunction = (max, player, level) -> max;
 		this.attributes = attributes;
-		this.validSlots = EquipmentSlotGroup.ANY;
+		this.validSlots = validSlots;
 	}
 
-	public Module(String id, int width, int height, long powerDraw, List<AddedAttribute> attributes, EquipmentSlotGroup validSlots) {
+	public Module(String id, int width, int height, long maxPowerDraw, TriFunction<Long, Player, Level, Long> powerFunction, List<AddedAttribute> attributes, EquipmentSlotGroup validSlots) {
 		this.id = id;
 		this.width = width;
 		this.height = height;
-		this.basePowerDraw = powerDraw;
+		this.maxPowerDraw = maxPowerDraw;
+		this.powerFunction = powerFunction;
 		this.attributes = attributes;
 		this.validSlots = validSlots;
 	}
@@ -47,8 +51,12 @@ public class Module {
 		return 0;
 	}
 
-	public long powerDraw() {
-		return basePowerDraw;
+	public long powerDraw(Player player, Level level) {
+		return powerFunction.apply(maxPowerDraw, player, level);
+	}
+
+	public long maxPowerDraw() {
+		return maxPowerDraw;
 	}
 
 	public long powerGen(Level level, Player player) {

@@ -6,6 +6,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -19,9 +21,10 @@ import org.ranch.mi_armory.MiArmoryAttachmentTypes;
 import org.ranch.mi_armory.MiArmoryAttributes;
 import org.ranch.mi_armory.MiArmoryEntities;
 import org.ranch.mi_armory.client.gui.EquipmentGridScreen;
+import org.ranch.mi_armory.client.rendering.HudRenderer;
 import org.ranch.mi_armory.client.rendering.SkyFlashRenderer;
 import org.ranch.mi_armory.client.rendering.nuke.EntityNukeEffectsRenderer;
-import org.spongepowered.asm.mixin.Unique;
+import org.ranch.mi_armory.items.ModularArmor;
 
 @EventBusSubscriber(
 		value = {Dist.CLIENT},
@@ -29,7 +32,9 @@ import org.spongepowered.asm.mixin.Unique;
 )
 public class MiArmoryClient {
 	public static final ResourceLocation SHIELD_BAR = MiArmory.location("textures/gui/shield_bar.png");
+	public static final ResourceLocation ENERGY_BAR = MiArmory.location("textures/gui/energy_bar.png");
 	public static SkyFlashRenderer skyFlashRenderer;
+	public static final Minecraft MC = Minecraft.getInstance();
 
 	@SubscribeEvent
 	private static void init(FMLConstructModEvent event) {
@@ -49,22 +54,11 @@ public class MiArmoryClient {
 
 	@SubscribeEvent
 	public static void registerGuiLayers(RegisterGuiLayersEvent event) {
-		event.registerAbove(VanillaGuiLayers.PLAYER_HEALTH, MiArmory.location("energy_shield"), (guiGraphics, partialTick) -> MiArmoryClient.renderShieldBar(guiGraphics));
+		event.registerAbove(VanillaGuiLayers.PLAYER_HEALTH, MiArmory.location("armor_hud"), (guiGraphics, partialTick) -> MiArmoryClient.renderHud(guiGraphics));
 	}
 
-	public static void renderShieldBar(GuiGraphics guiGraphics) {
-		float shield = Minecraft.getInstance().player.getData(MiArmoryAttachmentTypes.ENERGY_SHIELD);
-		double maxShield = Minecraft.getInstance().player.getAttributeValue(MiArmoryAttributes.ENERGY_SHIELD);
-		if (maxShield <= 0) return;
-		Gui gui = Minecraft.getInstance().gui;
-		int w = (int) ((shield / maxShield) * 79);
-		int x = guiGraphics.guiWidth() / 2 - 90;
-		int y = guiGraphics.guiHeight() - gui.leftHeight - 9;
-		guiGraphics.blit(SHIELD_BAR, x - 1, y - 1, 0, 0, 81, 9, 81, 9);
+	public static void renderHud(GuiGraphics guiGraphics) {
+		HudRenderer.render(guiGraphics);
 
-		for (int i = 0; i < w; i++) {
-			int color = i % 2 == 0 ? 0xFFFF00FF : 0xFFFF3EFF;
-			guiGraphics.fill(x + i, y, x + i + 1, y + 7, color);
-		}
 	}
 }

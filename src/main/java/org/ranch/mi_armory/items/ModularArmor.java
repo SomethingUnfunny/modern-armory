@@ -32,10 +32,12 @@ import java.util.List;
 public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 	public static final long BASE_ENERGY_CAPACITY = 2 << 14;
 	public static final EquipmentSlot[] EQUIPMENT_SLOTS = new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
+	public static final EquipmentSlot[] EQUIPMENT_SLOTS_REVERSED = new EquipmentSlot[]{EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD};
 
 	public ModularArmor(Type type, Holder<ArmorMaterial> material, int grid_size) {
 		super(material, type,
 				new Item.Properties()
+						.stacksTo(1)
 						.component(MIComponents.ENERGY, 0L)
 						.component(
 								MiArmoryComponents.EQUIPMENT_GRID_COMPONENT,
@@ -54,7 +56,7 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 		if (grid != null) {
 			int i = 0;
 			for (EquipmentGrid.Entry entry : grid.modules()) {
-				if (getStoredEnergy(stack) < entry.module().powerDraw()) continue; // power is taken in inventoryTick
+				if (getStoredEnergy(stack) < entry.module().maxPowerDraw()) continue; // power is taken in inventoryTick
 				entry.module().addAttributes(attributesBuilder, stack, type, i++);
 			}
 		}
@@ -118,7 +120,7 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 		EquipmentGrid grid = EquipmentGrid.getGridData(stack);
 		if (grid != null) {
 			for (EquipmentGrid.Entry entry : grid.modules()) {
-				this.tryUseEnergy(stack, entry.module().powerDraw());
+				this.tryUseEnergy(stack, entry.module().powerDraw(player, level));
 				this.setStoredEnergy(stack, Math.min(getEnergyCapacity(stack), getStoredEnergy(stack) + entry.module().powerGen(level, player)));
 			}
 		}
@@ -154,7 +156,7 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 				}
 			}
 
-			if (off < 8192) return;
+			if (off < 8) return;
 
 			// modification starts from here
 

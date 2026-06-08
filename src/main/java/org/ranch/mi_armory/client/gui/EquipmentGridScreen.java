@@ -41,7 +41,7 @@ public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridCo
 
 		EquipmentGrid grid = menu.getEquipmentGrid();
 		if (grid != null) {
-			//guiGraphics.enableScissor(gridX, gridY, gridX + TILE_SIZE * grid.width(), gridY + TILE_SIZE * grid.height());
+			guiGraphics.enableScissor(gridX, gridY, gridX + TILE_SIZE * GRID_GUI_SIZE, gridY + TILE_SIZE * GRID_GUI_SIZE);
 			PoseStack pose = guiGraphics.pose();
 			pose.pushPose();
 			pose.translate(gridX, gridY, 0);
@@ -61,7 +61,7 @@ public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridCo
 				}
 			}
 			pose.popPose();
-			//guiGraphics.disableScissor();
+			guiGraphics.disableScissor();
 		}
 	}
 
@@ -80,8 +80,9 @@ public class EquipmentGridScreen extends AbstractContainerScreen<EquipmentGridCo
 	}
 
 	public int[] mouseToGridPos(double x, double y, int gx, int gy, int tileSize, int entryW, int entryH, EquipmentGrid grid) {
-		x -= entryW * tileSize / 2.0 - tileSize / 2.0;
-		y -= entryH * tileSize / 2.0 - tileSize / 2.0;
+		float scaledTile = tileSize * (float) GRID_GUI_SIZE / grid.width();
+		x -= entryW * scaledTile / 2.0 - scaledTile / 2.0;
+		y -= entryH * scaledTile / 2.0 - scaledTile / 2.0;
 		double rx = (x - gx) * (float) grid.width() / GRID_GUI_SIZE;
 		double ry = (y - gy) * (float) grid.height() / GRID_GUI_SIZE;
 		int grx = (int) Math.floor(rx / tileSize);

@@ -19,6 +19,11 @@ public class MiArmoryItems {
 	public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MiArmory.MODID);
 	public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MiArmory.MODID);
 
+	public static final DeferredItem<Item> SOLAR_PANEL = ITEMS.registerItem("solar_panel", Item::new, new Item.Properties());
+	public static final DeferredItem<Item> EXOSKELETON = ITEMS.registerItem("exoskeleton", Item::new, new Item.Properties());
+	public static final DeferredItem<Item> SHIELD_MODULE = ITEMS.registerItem("shield_module", Item::new, new Item.Properties());
+	public static final DeferredItem<Item> SHIELD_MODULE_2 = ITEMS.registerItem("shield_module_2", Item::new, new Item.Properties());
+
 	public static final DeferredItem<Item> DETONATOR = ITEMS.registerItem("detonator", DetonatorItem::new, new Item.Properties().stacksTo(1));
 	public static final DeferredItem<Item> MULTI_DETONATOR = ITEMS.registerItem("multi_detonator", MultiDetonatorItem::new, new Item.Properties().stacksTo(1));
 
@@ -54,6 +59,10 @@ public class MiArmoryItems {
 		output.accept(MODULAR_TIER_2_CHESTPLATE.asItem());
 		output.accept(MODULAR_TIER_2_LEGGINGS.asItem());
 		output.accept(MODULAR_TIER_2_BOOTS.asItem());
+		output.accept(SOLAR_PANEL.asItem());
+		output.accept(EXOSKELETON.asItem());
+		output.accept(SHIELD_MODULE.asItem());
+		output.accept(SHIELD_MODULE_2.asItem());
 	}).build());
 
 	public static void register(IEventBus modEventBus) {

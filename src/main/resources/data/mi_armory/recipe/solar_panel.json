@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "GGG",
+    "NSP",
+    "CEC"
+  ],
+  "key": {
+    "G": {
+      "tag": "c:glass_panes/colorless"
+    },
+    "N": {
+      "item": "modern_industrialization:silicon_n_doped_plate"
+    },
+    "S": {
+      "item": "modern_industrialization:silicon_plate"
+    },
+    "P": {
+      "item": "modern_industrialization:silicon_p_doped_plate"
+    },
+    "C": {
+      "item": "modern_industrialization:electrum_cable"
+    },
+    "E": {
+      "item": "modern_industrialization:electronic_circuit"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "mi_armory:solar_panel"
+  }
+}

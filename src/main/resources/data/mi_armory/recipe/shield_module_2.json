@@ -1,0 +1,36 @@
+{
+  "type": "modern_industrialization:assembler",
+  "eu": 32,
+  "duration": 400,
+  "item_inputs": [
+    {
+      "item" : "mi_armory:shield_module",
+      "amount": 1
+    },
+    {
+      "item": "modern_industrialization:sodium_battery",
+      "amount": 2
+    },
+    {
+      "item" : "modern_industrialization:processing_unit",
+      "amount": 1
+    },
+    {
+      "item" : "modern_industrialization:superconductor_coil",
+      "amount": 16
+    }
+  ],
+
+  "fluid_inputs": [
+    {
+      "fluid" : "modern_industrialization:polyethylene",
+      "amount" : 2000
+    }
+  ],
+  "item_outputs": [
+    {
+      "item": "mi_armory:shield_module_2",
+      "amount": 1
+    }
+  ]
+}
