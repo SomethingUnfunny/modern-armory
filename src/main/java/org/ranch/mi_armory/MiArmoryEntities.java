@@ -6,8 +6,8 @@ import net.minecraft.world.entity.MobCategory;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import org.ranch.mi_armory.explosions.EntityNukeExplosion;
 import org.ranch.mi_armory.client.rendering.nuke.EntityNukeEffects;
+import org.ranch.mi_armory.explosions.EntityNukeExplosion;
 
 public class MiArmoryEntities {
 	public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, MiArmory.MODID);

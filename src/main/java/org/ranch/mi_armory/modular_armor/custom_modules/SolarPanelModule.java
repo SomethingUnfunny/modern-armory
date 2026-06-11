@@ -3,6 +3,7 @@ package org.ranch.mi_armory.modular_armor.custom_modules;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import org.ranch.mi_armory.modular_armor.Module;
@@ -21,7 +22,7 @@ public class SolarPanelModule extends Module {
 	}
 
 	@Override
-	public long powerGen(Level level, Player player) {
+	public long powerGen(Level level, Player player, ItemStack stack) {
 		int sunlight = level.getBrightness(LightLayer.SKY, BlockPos.containing(player.getEyePosition()));
 		if (level.getGameTime() % tickDelay == 0) {
 			return (long) (sunlight * Math.max(11 - level.getSkyDarken(), 0) * multiplier);

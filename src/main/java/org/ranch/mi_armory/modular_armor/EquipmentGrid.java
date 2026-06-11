@@ -2,12 +2,8 @@ package org.ranch.mi_armory.modular_armor;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.util.NeoForgeExtraCodecs;
-import org.ranch.mi_armory.MiArmory;
 import org.ranch.mi_armory.MiArmoryComponents;
-import org.ranch.mi_armory.MiArmoryDamageTypes;
 import org.ranch.mi_armory.modular_armor.custom_modules.NullModule;
 
 import java.util.ArrayList;
@@ -87,7 +83,7 @@ public record EquipmentGrid(int width, int height, List<Entry> modules) {
 			Module m = ModuleList.getFromItem(stack.getItem());
 			if (m == null) {
 				return new NullModule();
-			} else  {
+			} else {
 				return m;
 			}
 		}

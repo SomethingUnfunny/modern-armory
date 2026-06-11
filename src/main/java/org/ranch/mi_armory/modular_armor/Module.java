@@ -12,7 +12,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.function.TriFunction;
-import org.apache.logging.log4j.util.TriConsumer;
 import org.ranch.mi_armory.MiArmory;
 
 import java.util.List;
@@ -51,7 +50,7 @@ public class Module {
 		return 0;
 	}
 
-	public long powerDraw(Player player, Level level) {
+	public long powerDraw(Player player, Level level, ItemStack stack) {
 		return powerFunction.apply(maxPowerDraw, player, level);
 	}
 
@@ -59,7 +58,7 @@ public class Module {
 		return maxPowerDraw;
 	}
 
-	public long powerGen(Level level, Player player) {
+	public long powerGen(Level level, Player player, ItemStack stack) {
 		return 0;
 	}
 

@@ -2,12 +2,10 @@ package org.ranch.mi_armory.network;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.ChunkPos;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -16,7 +14,8 @@ import org.ranch.mi_armory.MiArmory;
 import org.ranch.mi_armory.client.MiArmoryClient;
 import org.ranch.mi_armory.client.rendering.nuke.NukeExplosionType;
 
-public record PacketDetonation(BlockPos location, int strength, NukeExplosionType explosionType) implements CustomPacketPayload {
+public record PacketDetonation(BlockPos location, int strength,
+                               NukeExplosionType explosionType) implements CustomPacketPayload {
 	public static final Type<PacketDetonation> TYPE = new Type<>(MiArmory.location("detonation"));
 
 	public static final StreamCodec<FriendlyByteBuf, PacketDetonation> STREAM_CODEC = StreamCodec.composite(

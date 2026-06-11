@@ -1,14 +1,10 @@
 package org.ranch.mi_armory.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.authlib.minecraft.client.MinecraftClient;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import org.ranch.mi_armory.client.MiArmoryClient;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

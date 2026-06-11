@@ -15,21 +15,24 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.Nullable;
 import org.ranch.mi_armory.MiArmory;
-import org.ranch.mi_armory.MiArmoryArmorMaterials;
 import org.ranch.mi_armory.MiArmoryComponents;
 import org.ranch.mi_armory.modular_armor.EquipmentGrid;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
+	public static final long DURABILITY_COST = 2 << 8; // is unbreakable but damage takes energy
 	public static final long BASE_ENERGY_CAPACITY = 2 << 14;
 	public static final EquipmentSlot[] EQUIPMENT_SLOTS = new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
 	public static final EquipmentSlot[] EQUIPMENT_SLOTS_REVERSED = new EquipmentSlot[]{EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD};
@@ -44,6 +47,12 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 								new EquipmentGrid(grid_size, grid_size, new ArrayList<>())
 						)
 		);
+	}
+
+	@Override
+	public <T extends LivingEntity> int damageItem(ItemStack stack, int amount, @Nullable T entity, Consumer<Item> onBroken) {
+		this.setStoredEnergy(stack, Math.max(this.getStoredEnergy(stack) - amount * DURABILITY_COST, 0));
+		return 0;
 	}
 
 	@Override
@@ -115,13 +124,13 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 	private void armorTick(ItemStack stack, Level level, Player player, int slotId, boolean p_41408_) {
 		if (!level.isClientSide()) {
 			distributeEnergy(player);
-		}
 
-		EquipmentGrid grid = EquipmentGrid.getGridData(stack);
-		if (grid != null) {
-			for (EquipmentGrid.Entry entry : grid.modules()) {
-				this.tryUseEnergy(stack, entry.module().powerDraw(player, level));
-				this.setStoredEnergy(stack, Math.min(getEnergyCapacity(stack), getStoredEnergy(stack) + entry.module().powerGen(level, player)));
+			EquipmentGrid grid = EquipmentGrid.getGridData(stack);
+			if (grid != null) {
+				for (EquipmentGrid.Entry entry : grid.modules()) {
+					this.tryUseEnergy(stack, entry.module().powerDraw(player, level, stack));
+					this.setStoredEnergy(stack, Math.min(getEnergyCapacity(stack), getStoredEnergy(stack) + entry.module().powerGen(level, player, stack)));
+				}
 			}
 		}
 	}
@@ -186,6 +195,34 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 		}
 	}
 
+	@Override
+	public boolean canElytraFly(ItemStack stack, LivingEntity entity) {
+		return hasModule(stack, "elytra");
+	}
+
+	@Override
+	public boolean elytraFlightTick(ItemStack stack, LivingEntity entity, int flightTicks) {
+		if (!entity.level().isClientSide && hasModule(stack, "elytra")) {
+			int nextFlightTick = flightTicks + 1;
+			if (nextFlightTick % 20 == 0) {
+				this.tryUseEnergy(stack, DURABILITY_COST);
+			}
+		}
+		return hasModule(stack, "elytra");
+	}
+
+	public boolean hasModule(ItemStack stack, String id) {
+		EquipmentGrid grid = EquipmentGrid.getGridData(stack);
+		if (grid != null) {
+			for (EquipmentGrid.Entry entry : grid.modules()) {
+				if (entry.module().id.equals(id)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	public boolean takeEnergy(ItemStack stack, long amount) {
 		return this.tryUseEnergy(stack, amount);
 	}
@@ -246,7 +283,7 @@ public class ModularArmor extends ArmorItem implements ISimpleEnergyItem {
 
 		MutableComponent energyFormatted = new MITooltips.Line(MIText.EnergyStored).arg(new MITooltips.NumberWithMax(energy, getEnergyCapacity(stack)), MITooltips.EU_MAXED_PARSER).build();
 		String percentFormatted = String.valueOf((int) Math.floor(((float) energy / getEnergyCapacity(stack)) * 100));
-		MutableComponent percentComponent = Component.literal(" ("+percentFormatted+"%)").withStyle(Style.EMPTY.withColor(TextColor.fromRgb(16768637)));
+		MutableComponent percentComponent = Component.literal(" (" + percentFormatted + "%)").withStyle(Style.EMPTY.withColor(TextColor.fromRgb(16768637)));
 		tooltipComponents.add(energyFormatted.append(percentComponent));
 		tooltipComponents.add(Component.translatable("mi_armory.has_grid").withStyle(ChatFormatting.GRAY));
 	}

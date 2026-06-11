@@ -7,5 +7,5 @@ public class MiArmoryConstants {
 	public static final int UNDERGROUND = -100;
 
 	// armor
-	public static final long SHIELD_COST = 32768;
+	public static final long SHIELD_COST = 8192;
 }

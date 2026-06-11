@@ -1,16 +1,16 @@
 package org.ranch.mi_armory.modular_armor;
 
-import aztech.modern_industrialization.MIRegistries;
-import aztech.modern_industrialization.blocks.forgehammer.ForgeHammerScreenHandler;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.*;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ArmorSlot;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
-import org.jspecify.annotations.Nullable;
 import org.ranch.mi_armory.MiArmory;
 import org.ranch.mi_armory.MiArmoryBlocks;
 import org.ranch.mi_armory.network.PacketEquipmentGridClick;
@@ -109,7 +109,7 @@ public class EquipmentGridContainerMenu extends AbstractContainerMenu {
 			} else if (!getCarried().isEmpty() && ModuleList.hasItem(getCarried().getItem())) { // add to grid
 				ItemStack carriedStack = getCarried().copy();
 				EquipmentGrid.Entry toAdd = new EquipmentGrid.Entry(x, y, carriedStack.copyWithCount(1));
-				if (grid.canAdd(toAdd) && toAdd.module().canInsert(((ArmorItem)armor.getItem().getItem()).getEquipmentSlot())) {
+				if (grid.canAdd(toAdd) && toAdd.module().canInsert(((ArmorItem) armor.getItem().getItem()).getEquipmentSlot())) {
 					setEquipmentGrid(grid.add(toAdd));
 					carriedStack.setCount(carriedStack.getCount() - 1);
 					if (carriedStack.isEmpty()) {

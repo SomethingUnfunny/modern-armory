@@ -1,8 +1,6 @@
 package org.ranch.mi_armory.blocks;
 
 
-import aztech.modern_industrialization.MIBlock;
-import aztech.modern_industrialization.blocks.forgehammer.ForgeHammerScreenHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;

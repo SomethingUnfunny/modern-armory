@@ -1,7 +1,6 @@
 package org.ranch.mi_armory.modular_armor;
 
 import aztech.modern_industrialization.MI;
-import aztech.modern_industrialization.items.PortableStorageUnit;
 import aztech.modern_industrialization.materials.MIMaterials;
 import aztech.modern_industrialization.materials.Material;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -9,15 +8,18 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.common.NeoForgeMod;
 import org.ranch.mi_armory.MiArmory;
 import org.ranch.mi_armory.MiArmoryAttributes;
+import org.ranch.mi_armory.items.ModularArmor;
 import org.ranch.mi_armory.modular_armor.custom_modules.BatteryModule;
 import org.ranch.mi_armory.modular_armor.custom_modules.ShieldModule;
 import org.ranch.mi_armory.modular_armor.custom_modules.SolarPanelModule;
 import org.ranch.mi_armory.modular_armor.custom_modules.SpeedModule;
-import org.ranch.mi_armory.util.UnfunUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -61,8 +63,59 @@ public class ModuleList {
 		addBattery(MIMaterials.CADMIUM);
 		addBattery(MIMaterials.PLUTONIUM);
 
+		addDrill(MIMaterials.COPPER, 0.1);
+		addDrill(MIMaterials.BRONZE, 0.2);
+		addDrill(MIMaterials.GOLD, 0.4);
+		addDrill(MIMaterials.STEEL, 0.8);
+		addDrill(MIMaterials.ALUMINUM, 1.6);
+		addDrill(MIMaterials.STAINLESS_STEEL, 3.2);
+		addDrill(MIMaterials.TITANIUM, 6.4);
+
 		double baseMotorBoost = 0.015;
 		long drawPerBaseBoost = 16;
+
+		addModule(
+				MI.id("gravichestplate"),
+				new Module(
+						"gravichestplate",
+						3, 4,
+						1024,
+						(m, p, l) -> p.getAbilities().flying ? m : 0,
+						List.of(
+								new Module.AddedAttribute(
+										NeoForgeMod.CREATIVE_FLIGHT, 1, AttributeModifier.Operation.ADD_VALUE
+								)
+						),
+						EquipmentSlotGroup.CHEST
+				)
+		);
+
+		addModule(
+				ResourceLocation.withDefaultNamespace("elytra"),
+				new Module(
+						"elytra",
+						2, 3,
+						0,
+						List.of(),
+						EquipmentSlotGroup.CHEST
+				)
+		);
+
+		addModule(
+				MI.id("singularity"),
+				new Module(
+						"singularity",
+						1, 1,
+						0,
+						List.of(),
+						EquipmentSlotGroup.ANY
+				) {
+					@Override
+					public long powerGen(Level level, Player player, ItemStack stack) {
+						return ((ModularArmor) stack.getItem()).getEnergyCapacity(stack);
+					}
+				}
+		);
 
 		addModule(
 				MiArmory.location("exoskeleton"),
@@ -128,8 +181,8 @@ public class ModuleList {
 				new ShieldModule(
 						"shield_1",
 						2, 2,
-						10f,
-						0.03f
+						25f,
+						0.04f
 				)
 		);
 
@@ -138,8 +191,8 @@ public class ModuleList {
 				new ShieldModule(
 						"shield_2",
 						2, 2,
-						20f,
-						0.06f
+						50f,
+						0.08f
 				)
 		);
 
@@ -148,7 +201,7 @@ public class ModuleList {
 				new SolarPanelModule(
 						"solar_panel",
 						1, 1,
-						0.5, 1
+						1, 1
 				)
 		);
 	}
@@ -162,6 +215,21 @@ public class ModuleList {
 						2,
 						material,
 						List.of()
+				)
+		);
+	}
+
+	private static void addDrill(Material material, double speed) {
+		addModule(
+				MI.id(material.name + "_drill"),
+				new Module(
+						material.name + "_drill",
+						1, 1,
+						0,
+						List.of(
+								new Module.AddedAttribute(Attributes.MINING_EFFICIENCY, speed, AttributeModifier.Operation.ADD_VALUE)
+						),
+						EquipmentSlotGroup.CHEST
 				)
 		);
 	}

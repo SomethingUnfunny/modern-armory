@@ -4,13 +4,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.joml.Matrix4f;
 import org.joml.Vector2d;
@@ -21,7 +19,6 @@ import org.ranch.mi_armory.network.PacketDetonation;
 import org.ranch.mi_armory.util.UnfunMath;
 
 import java.util.ArrayList;
-import java.util.Set;
 
 public class SkyFlashRenderer {
 

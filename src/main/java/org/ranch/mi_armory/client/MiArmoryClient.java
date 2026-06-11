@@ -1,13 +1,10 @@
 package org.ranch.mi_armory.client;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -17,14 +14,11 @@ import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import org.ranch.mi_armory.MiArmory;
-import org.ranch.mi_armory.MiArmoryAttachmentTypes;
-import org.ranch.mi_armory.MiArmoryAttributes;
 import org.ranch.mi_armory.MiArmoryEntities;
 import org.ranch.mi_armory.client.gui.EquipmentGridScreen;
 import org.ranch.mi_armory.client.rendering.HudRenderer;
 import org.ranch.mi_armory.client.rendering.SkyFlashRenderer;
 import org.ranch.mi_armory.client.rendering.nuke.EntityNukeEffectsRenderer;
-import org.ranch.mi_armory.items.ModularArmor;
 
 @EventBusSubscriber(
 		value = {Dist.CLIENT},

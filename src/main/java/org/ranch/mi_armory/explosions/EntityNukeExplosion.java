@@ -1,8 +1,5 @@
 package org.ranch.mi_armory.explosions;
 
-import aztech.modern_industrialization.machines.helper.SteamHelper;
-import aztech.modern_industrialization.materials.property.MaterialHardness;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -11,21 +8,16 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3i;
-import org.lwjgl.system.MathUtil;
 import org.ranch.mi_armory.*;
 import org.ranch.mi_armory.client.rendering.nuke.NukeExplosionType;
 import org.ranch.mi_armory.network.PacketDetonation;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 public class EntityNukeExplosion extends EntityChunkloading {
@@ -90,7 +82,7 @@ public class EntityNukeExplosion extends EntityChunkloading {
 		double z = this.getZ();
 		AABB aabb = (new AABB(x, y, z, x, y, z)).inflate(radius);
 
-		for(Entity entity : world.getEntities(null, aabb)) {
+		for (Entity entity : world.getEntities(null, aabb)) {
 			double dist = entity.position().distanceTo(position());
 			if (dist > radius) continue;
 
@@ -110,7 +102,7 @@ public class EntityNukeExplosion extends EntityChunkloading {
 					double resistance = l.getAttributeValue(MiArmoryAttributes.SHOCKWAVE_RESISTANCE);
 					resDamage *= 1 - resistance;
 				}
-				entity.hurt(blastSource, (float)resDamage);
+				entity.hurt(blastSource, (float) resDamage);
 				Vec3 pushDir = entity.position().subtract(position()).normalize();
 				pushDir = pushDir.normalize().scale(3.0F);
 				pushDir = new Vec3(pushDir.x, 1.0F, pushDir.z);
@@ -122,7 +114,7 @@ public class EntityNukeExplosion extends EntityChunkloading {
 
 	public double getDamage(double dist, double radius, double damage) {
 		double n = (dist / radius) * 10;
-		double i = 1/(n*n);
+		double i = 1 / (n * n);
 		return i * damage;
 	}
 
